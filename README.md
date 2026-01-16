@@ -1,95 +1,66 @@
-```
+# Tabela Brasileira de Composição de Alimentos (TACO)
 
-## Fontes e Referências
+A **Tabela Brasileira de Composição de Alimentos (TACO)** constitui um banco de dados desenvolvido pelo Núcleo de Estudos e Pesquisas em Alimentação (NEPA) da Universidade Estadual de Campinas (UNICAMP), com o propósito de disponibilizar informações detalhadas acerca da composição nutricional dos alimentos consumidos no Brasil.
 
-### TACO
-- [Site oficial NEPA/UNICAMP](https://www.nepa.unicamp.br/taco/tabela.php)
-- Arquivos originais: ver `originais/urls-originais.txt`
+O referido banco de dados contempla informações sobre centenas de alimentos, abrangendo teores de macronutrientes (proteínas, carboidratos, lipídios), fibras, vitaminas, minerais e outros componentes nutricionais relevantes. As amostras alimentares foram coletadas em distintas regiões do território nacional, de modo a garantir representatividade e fidedignidade dos dados à realidade brasileira.
 
-### POF
-- [Site oficial IBGE](https://www.ibge.gov.br/estatisticas/sociais/populacao/9050-pesquisa-de-orcamentos-familiares.html?edicao=9064)
-- [Tabela de Medidas Referidas para os Alimentos Consumidos no Brasil (PDF e XLS)](https://ftp.ibge.gov.br/Orcamentos_Familiares/Pesquisa_de_Orcamentos_Familiares_2008_2009/Tabela_de_Medidas_Referidas_para_os_Alimentos_Consumidos_no_Brasil/)
+A TACO é amplamente utilizada por nutricionistas, pesquisadores, profissionais da saúde e pela indústria alimentícia, subsidiando o planejamento de dietas, a elaboração de rótulos nutricionais, estudos epidemiológicos e a formulação de políticas públicas de alimentação e nutrição.
 
-## Licença
-Este repositório apenas reorganiza e facilita o acesso a dados públicos do NEPA/UNICAMP e IBGE. Consulte as licenças e termos de uso originais para cada fonte.
+**Referências:**
+- [Tabela TACO (XLS)](https://www.nepa.unicamp.br/taco/contar/Taco_4a_edicao_2011.xls?arquivo=1)
+- [Tabela TACO (PDF)](https://www.nepa.unicamp.br/taco/contar/taco_4_edicao_ampliada_e_revisada.pdf?arquivo=1)
 
 ---
-Colabore! Sugestões, issues e pull requests são bem-vindos.
 
-## Como Usar
+## Guia Alimentar para a População Brasileira
 
-### Em R
-```r
-alimentos <- read.csv('formatados/alimentos.csv', encoding = 'UTF-8')
-head(alimentos)
+O **Guia Alimentar para a População Brasileira** é um documento oficial do Ministério da Saúde, cuja versão mais recente foi publicada em 2014. Seu objetivo é orientar a população quanto a práticas alimentares saudáveis, adotando uma abordagem abrangente que considera não apenas os nutrientes, mas também o alimento em sua integralidade e o contexto sociocultural do consumo.
+
+### Principais Conceitos
+
+O guia classifica os alimentos em quatro categorias, de acordo com o grau de processamento:
+
+- **Alimentos in natura ou minimamente processados:** frutas, legumes, verduras, grãos, carnes, ovos, leite.
+- **Ingredientes culinários:** óleos, açúcar, sal, farinhas (utilizados no preparo de alimentos in natura).
+- **Alimentos processados:** produtos resultantes da modificação de alimentos in natura por meio da adição de sal, açúcar ou óleo (exemplos: queijos, conservas, pães artesanais).
+- **Alimentos ultraprocessados:** formulações industriais compostas por múltiplos ingredientes, aditivos e reduzido teor de alimentos in natura (exemplos: refrigerantes, biscoitos recheados, salgadinhos, embutidos).
+
+**Referência:**
+- [Guia Alimentar para a População Brasileira (PDF)](https://bvsms.saude.gov.br/bvs/publicacoes/guia_alimentar_populacao_brasileira_2ed.pdf)
+
+---
+
+## Pesquisa de Orçamentos Familiares (POF)
+
+A **Pesquisa de Orçamentos Familiares (POF)**, conduzida pelo Instituto Brasileiro de Geografia e Estatística (IBGE), é uma pesquisa domiciliar que investiga as estruturas de consumo, gastos, rendimentos e condições de vida das famílias brasileiras. Os dados obtidos permitem análises sobre a distribuição dos orçamentos familiares, padrões de consumo, desigualdade de renda, segurança alimentar e perfil nutricional da população.
+
+### Sobre a Tabela de Medidas Referidas
+
+Esta publicação apresenta a **Tabela de Medidas Referidas**, a qual identifica, para cada tipo de alimento e forma de preparo, a quantidade correspondente em gramas ou mililitros associada às medidas caseiras usualmente empregadas pela população (tais como "colher de sopa", "copo", "fatia", entre outras). A referida tabela foi elaborada a partir dos dados de consumo alimentar coletados na POF 2008-2009, em parceria com o Ministério da Saúde.
+
+**Referências:**
+- [Página oficial da POF](https://www.ibge.gov.br/estatisticas/sociais/populacao/9050-pesquisa-de-orcamentos-familiares.html?edicao=9064&t=resultados)
+- [Tabela de Medidas Referidas (ZIP)](https://ftp.ibge.gov.br/Orcamentos_Familiares/Pesquisa_de_Orcamentos_Familiares_2008_2009/Tabela_de_Medidas_Referidas_para_os_Alimentos_Consumidos_no_Brasil/tabelamedidas.zip)
+- [Tabela de Medidas Referidas - Banco de Dados (ZIP)](https://ftp.ibge.gov.br/Orcamentos_Familiares/Pesquisa_de_Orcamentos_Familiares_2008_2009/Tabela_de_Medidas_Referidas_para_os_Alimentos_Consumidos_no_Brasil/tabelamedidas_bd.zip)
+
+----
+
+## Como Citar
+
+Se você utilizar este repositório em seu trabalho, por favor cite:
+```bibtex
+@misc{brolesi2026taco,
+  author       = {Brolesi, F. F.},
+  title        = {{TACO} - Tabela Brasileira de Composição de Alimentos: Repositório para acesso facilitado aos dados da {TACO} ({NEPA/UNICAMP}) e {POF} ({IBGE})},
+  year         = {2026},
+  publisher    = {GitHub},
+  url          = {https://github.com/brolesi/taco},
+  note         = {Acessado em: [data de acesso]}
+}
 ```
 
-### Em Python (pandas)
-```python
-import pandas as pd
-alimentos = pd.read_csv('formatados/alimentos.csv', encoding='utf-8')
-print(alimentos.head())
-```
+**Importante:** Este repositório reorganiza dados públicos. Para trabalhos acadêmicos, considere citar também as fontes primárias:
 
-# TACO - Tabela Brasileira de Composição de Alimentos
-
-> **Repositório para acesso facilitado, análise e integração dos dados da TACO (NEPA/UNICAMP) e POF (IBGE) em formatos prontos para uso em ciência de dados, nutrição e saúde pública.**
-
-## Visão Geral
-Este repositório reúne arquivos originais e versões processadas das principais tabelas brasileiras de composição de alimentos, facilitando o uso em projetos de análise nutricional, scripts em R/Python, e integração com bancos de dados.
-
-## Estrutura do Repositório
-
-
-```
-├── formatados/   # Tabelas em CSV prontas para análise (R, Python, etc.)
-│   ├── alimentos.csv
-│   ├── aminoacidos.csv
-│   └── acidos-graxos.csv
-├── originais/    # Arquivos originais (XLS, PDF, fontes)
-│   ├── Taco_4a_edicao_2011.xls
-│   ├── taco_4_edicao_ampliada_e_revisada.pdf
-│   ├── guia_alimentar_populacao_brasileira_2ed.pdf
-│   └── urls-originais.txt
-├── tabelas/      # CSVs semi-estruturados (pré-processamento)
-│   ├── alimentos.csv
-│   ├── aminoacidos.csv
-│   └── acidos-graxos.csv
-├── pof/          # Dados da Pesquisa de Orçamentos Familiares (IBGE)
-│   ├── tabelamedidas.xls
-│   └── tabelamedidas_bd.xls
-└── README.md
-```
-
-## Conteúdo dos Dados
-
-### TACO (NEPA/UNICAMP)
-- **Fonte:** [NEPA/UNICAMP - TACO](https://www.nepa.unicamp.br/taco/tabela.php)
-- **Arquivos originais:** disponíveis em `originais/` (XLS, PDF)
-- **Arquivos processados:**
-	- `formatados/`: CSVs prontos para análise, com nomes de colunas padronizados e dados limpos
-	- `tabelas/`: CSVs semi-estruturados, extraídos dos originais
-
-#### Exemplos de tabelas disponíveis:
-- **alimentos.csv:** Informações nutricionais gerais (energia, proteínas, lipídeos, carboidratos, fibras, minerais, vitaminas)
-- **aminoacidos.csv:** Perfil de aminoácidos dos alimentos
-- **acidos-graxos.csv:** Perfil de ácidos graxos dos alimentos
-
-### POF (IBGE)
-- **Fonte:** [Pesquisa de Orçamentos Familiares - IBGE](https://www.ibge.gov.br/estatisticas/sociais/populacao/9050-pesquisa-de-orcamentos-familiares.html?edicao=9064)
-- **Arquivos:** disponíveis em `pof/` (tabelas de medidas referidas, microdados)
-
-# POF - Pesquisa de Orçamentos Familiares
-
-https://www.ibge.gov.br/estatisticas/sociais/populacao/9050-pesquisa-de-orcamentos-familiares.html?edicao=9064
-
-https://www.ibge.gov.br/estatisticas/sociais/populacao/9050-pesquisa-de-orcamentos-familiares.html?edicao=9064&t=resultados
-
-Sobre - Tabela de medidas referidas para os alimentos consumidos no Brasil
-A Pesquisa de Orçamentos Familiares 2008-2009 teve por objetivo fornecer informações sobre a composição dos orçamentos domésticos, a partir da investigação dos hábitos de consumo, da alocação de gastos e da distribuição dos rendimentos, segundo as características dos domicílios e das pessoas. A POF investigou, também, a autopercepção da qualidade de vida e as características do perfil nutricional da população brasileira.
-
-Dando prosseguimento à divulgação de resultados da pesquisa, o IBGE apresenta, nesta publicação, a Tabela de Medidas Referidas para os Alimentos Consumidos no Brasil, na qual é identificada, para cada tipo de produto e forma de preparação, a quantidade em gramas ou mililitros associada à medida citada para servi-lo. Para sua construção, foram compilados os dados relatados pelos informantes sobre a ingestão dos diferentes alimentos consumidos no domicílio ou fora dele, nas áreas urbana e rural de todo o País, e utilizadas outras fontes de consulta, como publicações técnico-científicas, rótulos de alimentos e pesagens diretas realizadas em centros de pesquisas de universidades brasileiras. O estudo foi realizado em parceria com o Ministério da Saúde. Para a avaliação, compilação e estruturação dos resultados ora apresentados, o IBGE contou com a contribuição de técnicos do Órgão parceiro e, também, com especialistas em nutrição, de reconhecida experiência e competência, mobilizados por aquele Ministério.
-
-A publicação inclui, ainda, uma visão dos objetivos da pesquisa e da metodologia utilizada, com ênfase nos principais conceitos e definições, aspectos de amostragem, instrumentos e procedimentos de coleta e tratamento das informações. O CD-ROM que a acompanha reproduz o presente volume e contém uma planilha complementar, com as informações constantes na tabela impressa, o que permite ao usuário o cruzamento de dados bem como a construção de outras planilhas segundo sua perspectiva de interesse. Apresenta, adicionalmente, os dois instrumentos utilizados durante a etapa de coleta das informações sobre o consumo alimentar pessoal: o Bloco de Consumo Alimentar Pessoal, POF 7, utilizado pelos informantes para a anotação dos registros de ingestão alimentar, e as respectivas Instruções para o Preenchimento.
-
-O IBGE disponibiliza também os microdados da pesquisa para facilitar a exploração de sua base de dados segundo a perspectiva de interesse dos usuários.  
+- NEPA/UNICAMP. *Tabela Brasileira de Composição de Alimentos (TACO)*. 4ª ed. Campinas, 2011.
+- IBGE. *Pesquisa de Orçamentos Familiares 2008-2009: Tabela de Medidas Referidas para os Alimentos Consumidos no Brasil*. Rio de Janeiro, 2011.
+- BRASIL. Ministério da Saúde. *Guia Alimentar para a População Brasileira*. 2ª ed. Brasília, 2014.
