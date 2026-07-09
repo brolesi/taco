@@ -153,6 +153,9 @@ sopa", "copo", "fatia") a quantidades em gramas ou mililitros.
 
 ## Como citar
 
+Os metadados de citação também estão em [`CITATION.cff`](CITATION.cff)
+(botão "Cite this repository" no GitHub).
+
 ```bibtex
 @misc{brolesi2026taco,
   author       = {Brolesi, F. F.},

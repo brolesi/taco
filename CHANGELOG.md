@@ -40,6 +40,10 @@ e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
   (configuração de Ruff e pytest), `.gitignore` e licença MIT.
 - Documentação: dicionário de dados (`docs/dicionario-dados.md`),
   guia de contribuição (`CONTRIBUTING.md`) e README reescrito.
+- Arquivos de metadados e higiene: `CITATION.cff` (botão "Cite this
+  repository" do GitHub), `.gitattributes` (normalização de quebras de linha),
+  `.editorconfig`, `.github/dependabot.yml` (atualizações mensais de
+  dependências) e `CLAUDE.md`.
 
 ### Removido
 

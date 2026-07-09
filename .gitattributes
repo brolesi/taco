@@ -1,0 +1,9 @@
+# Normaliza quebras de linha: LF no repositório, nativo no checkout.
+* text=auto
+
+# Scripts de lote do Windows exigem CRLF.
+*.bat text eol=crlf
+
+# Fontes originais binárias.
+*.xls binary
+*.pdf binary
