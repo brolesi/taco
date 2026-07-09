@@ -186,38 +186,34 @@ df.to_csv('taco_aminoacidos.csv', index=False, encoding='utf-8')
 
 ---
 
-## Opção: Adicionar Coluna de Categoria
+## Adicionar Coluna de Categoria
 
-Se quiser preservar a categorização dos alimentos:
+A categoria deve ser derivada das **linhas separadoras** da própria aba, com
+forward-fill, **antes** de removê-las.
+
+> ⚠️ Não use faixas de `numero_alimento` para inferir a categoria: a numeração
+> **não** é contígua por categoria (ex.: o alimento 561, "Feijão, carioca,
+> cozido", pertence a "Leguminosas e derivados", não a uma faixa de "Produtos
+> açucarados").
 
 ```python
-# Mapeamento de número do alimento para categoria
-categoria_ranges = {
-    'Cereais e derivados': (1, 73),
-    'Verduras, hortaliças e derivados': (74, 183),
-    'Frutas e derivados': (184, 290),
-    'Gorduras e óleos': (291, 306),
-    'Pescados e frutos do mar': (307, 365),
-    'Carnes e derivados': (366, 502),
-    'Leite e derivados': (503, 531),
-    'Bebidas': (532, 547),
-    'Ovos e derivados': (548, 555),
-    'Produtos açucarados': (556, 580),
-    'Miscelâneas': (581, 591),
-    'Outros industrializados': (592, 602),
-    'Alimentos preparados': (603, 639),
-    'Leguminosas e derivados': (640, 674),
-    'Nozes e sementes': (675, 597)
-}
+categorias = [
+    'Cereais e derivados', 'Verduras, hortaliças e derivados', 'Frutas e derivados',
+    'Gorduras e óleos', 'Pescados e frutos do mar', 'Carnes e derivados',
+    'Leite e derivados', 'Bebidas (alcoólicas e não alcoólicas)', 'Ovos e derivados',
+    'Produtos açucarados', 'Miscelâneas', 'Outros alimentos industrializados',
+    'Alimentos preparados', 'Leguminosas e derivados', 'Nozes e sementes'
+]
 
-def get_categoria(num):
-    for cat, (inicio, fim) in categoria_ranges.items():
-        if inicio <= num <= fim:
-            return cat
-    return 'Outros'
+# Antes de filtrar as linhas separadoras:
+rotulos = df['numero_alimento']
+df['categoria'] = rotulos.where(rotulos.isin(categorias)).ffill()
 
-df['categoria'] = df['numero_alimento'].apply(get_categoria)
+# ... em seguida, aplicar o filtro que mantém apenas linhas de dados.
 ```
+
+Para a aba de aminoácidos (sem linhas separadoras), obtenha a categoria pelo
+`numero_alimento`, cruzando com a aba de composição já processada.
 
 ---
 
