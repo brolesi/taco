@@ -2,4 +2,4 @@
 fastapi>=0.139.0
 uvicorn[standard]>=0.51.0
 pandas>=2.3.3
-xlrd>=2.0.1  # leitura dos arquivos .xls originais (pipeline)
+xlrd>=2.0.2  # leitura dos arquivos .xls originais (pipeline)
