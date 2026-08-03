@@ -1,5 +1,5 @@
 # Dependências de runtime (API e pipeline de dados)
 fastapi>=0.140.13
-uvicorn[standard]>=0.51.0
+uvicorn[standard]>=0.52.0
 pandas>=2.3.3
 xlrd>=2.0.2  # leitura dos arquivos .xls originais (pipeline)
