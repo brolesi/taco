@@ -181,3 +181,54 @@ def test_facetas_nao_entram_na_soma():
     totais = client.post("/foods/sum", json={"items": [{"id": 1, "grams": 100}]}).json()
     assert "base_name" not in totais["total_nutrients"]
     assert "preparation" not in totais["total_nutrients"]
+
+
+def test_health_reporta_medidas():
+    assert client.get("/health").json()["total_measures"] == 11801
+
+
+def test_list_measures_busca_e_filtro():
+    body = client.get("/measures", params={"search": "arroz", "measure": "colher de sopa"}).json()
+    assert body["total"] > 0
+    assert all("ARROZ" in m["food_description"] for m in body["measures"])
+    assert all(m["measure"] == "COLHER DE SOPA" for m in body["measures"])
+    assert all(m["grams"] > 0 for m in body["measures"])
+
+
+def test_list_measures_ignora_acentos():
+    com = client.get("/measures", params={"search": "feijão"}).json()["total"]
+    sem = client.get("/measures", params={"search": "feijao"}).json()["total"]
+    assert com == sem > 0
+
+
+def test_list_measures_paginacao():
+    body = client.get("/measures", params={"limit": 5, "skip": 10}).json()
+    assert len(body["measures"]) == 5
+    assert body["total"] == 11801
+
+
+def test_list_measure_types():
+    tipos = client.get("/measures/types").json()
+    assert {"measure": "COLHER DE SOPA", "record_count": 578} in tipos
+
+
+def test_variants_agrupa_por_base_e_qualificadores():
+    body = client.get("/foods/273/variants").json()  # Abadejo, filé, congelado, assado
+    assert body["base_name"] == "Abadejo"
+    preparos = {v["preparation"] for v in body["variants"]}
+    assert preparos == {"cozido", "cru", "grelhado"}
+    assert 273 not in [v["id"] for v in body["variants"]]  # não devolve a si mesmo
+    # Umidade acompanha cada variante: é o que separa diferença de água de
+    # perda de nutriente.
+    assert all(v["moisture_pct"] > 0 for v in body["variants"])
+
+
+def test_variants_nao_mistura_qualificadores_diferentes():
+    # "Arroz, integral, cozido" pareia com "Arroz, integral, cru", nunca com
+    # "Arroz, tipo 1, cru".
+    body = client.get("/foods/1/variants").json()
+    assert [v["description"] for v in body["variants"]] == ["Arroz, integral, cru"]
+
+
+def test_variants_de_alimento_inexistente():
+    assert client.get("/foods/99999/variants").status_code == 404

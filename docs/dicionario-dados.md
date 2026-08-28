@@ -1,4 +1,4 @@
-# Dicionário de Dados — CSVs processados da TACO
+# Dicionário de Dados — CSVs processados
 
 Os arquivos em [`data/processed/taco/`](../data/processed/taco/) são gerados por
 [`scripts/process_taco.py`](../scripts/process_taco.py) a partir da planilha original
@@ -149,3 +149,39 @@ Perfil de aminoácidos, disponível apenas para um subconjunto de alimentos.
 | `glicina_g` | g | Glicina | `glycine_g` |
 | `prolina_g` | g | Prolina | `proline_g` |
 | `serina_g` | g | Serina | `serine_g` |
+
+## `pof_medidas_caseiras.csv` (11.801 registros)
+
+Gerado por [`scripts/process_pof.py`](../scripts/process_pof.py) a partir de
+`data/raw/pof/tabelamedidas_bd.xls` (Tabela de Medidas Referidas para os
+Alimentos Consumidos no Brasil, POF 2008-2009, IBGE). Informa **quanto pesa em
+gramas** cada medida caseira de um alimento: 1.120 alimentos e 103 tipos de
+medida ("colher de sopa", "concha", "fatia", "unidade").
+
+| Coluna | Unidade | Descrição | Campo na API |
+|---|---|---|---|
+| `codigo_alimento` | — | Código do alimento no IBGE | `pof_food_id` |
+| `descricao_alimento` | — | Descrição do alimento na POF | `food_description` |
+| `codigo_preparacao` | — | Código da preparação | `preparation_code` |
+| `descricao_preparacao` | — | Preparação (`NAO SE APLICA` quando não há) | `preparation` |
+| `codigo_medida` | — | Código do tipo de medida | `measure_code` |
+| `descricao_medida` | — | Tipo de medida caseira | `measure` |
+| `codigo_medida_referencia` | — | Código da medida de referência | `reference_measure_code` |
+| `descricao_medida_referencia` | — | Medida usada como referência | `reference_measure` |
+| `quantidade_g` | g | Peso da medida | `grams` |
+| `codigo_fonte` | — | Código da fonte bibliográfica (ver publicação da POF) | `source_code` |
+| `descricao_fonte` | — | Descrição do alimento na fonte | `source_description` |
+
+### Não há equivalência automática entre POF e TACO
+
+`codigo_alimento` (IBGE) e `numero_alimento` (TACO) são numerações
+independentes, e **este repositório não faz a ponte entre elas**. Medimos o
+quanto uma correspondência automática cobriria: apenas 148 dos 1.124 alimentos
+da POF (13%) têm nome-base idêntico a algum alimento da TACO, e desses só 83
+são inequívocos — "arroz" na POF corresponde a 6 alimentos da TACO, "feijão" a
+15, que diferem em variedade e preparo e, portanto, em composição.
+
+Por isso `/foods/sum` continua exigindo gramas: converter medida em gramas
+automaticamente exigiria escolher por conta própria *qual* arroz, e um erro
+nessa escolha vira erro de nutriente sem que o consumidor perceba. O caminho
+correto é consultar `/measures` para descobrir o peso e passar as gramas.

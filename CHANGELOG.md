@@ -3,6 +3,29 @@
 Este arquivo segue o formato [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.4.0] - não lançado
+
+### Adicionado
+
+- **Pipeline da POF/IBGE** (`scripts/process_pof.py`): normaliza a Tabela de
+  Medidas Referidas em `data/processed/pof/pof_medidas_caseiras.csv` — 11.801
+  registros com o peso em gramas de 103 medidas caseiras para 1.120 alimentos.
+  A planilha em `data/raw/pof/` estava versionada desde a 1.0.0 sem nenhum
+  pipeline que a consumisse.
+- Endpoints `GET /measures` (busca por alimento e filtro por medida, ambos sem
+  acento) e `GET /measures/types`. `GET /health` passou a informar
+  `total_measures`.
+- `GET /foods/{id}/variants`: o mesmo alimento nas outras formas de preparo
+  (97 grupos, 208 alimentos), agrupado pelas facetas da 1.3.0. Devolve
+  `moisture_pct` junto, mas **não** calcula retenção de nutrientes: a TACO
+  amostra cru e cozido de forma independente e não fornece fator de
+  rendimento, então a conta por 100 g mede a água incorporada, não a perda.
+
+### Alterado
+
+- O dicionário de dados agora cobre os dois pipelines e registra por que não há
+  equivalência automática entre os códigos da POF e os da TACO.
+
 ## [1.3.0] - 2026-08-28
 
 ### Adicionado

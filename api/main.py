@@ -16,9 +16,10 @@ import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field, create_model
 
-API_VERSION = "1.3.0"
+API_VERSION = "1.4.0"
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "processed" / "taco"
+POF_DIR = Path(__file__).resolve().parent.parent / "data" / "processed" / "pof"
 
 # Casas decimais nas respostas. Cinco casas preservam o valor-traço (1e-5)
 # e eliminam ruído de ponto flutuante dos valores médios do pipeline.
@@ -116,6 +117,23 @@ AMINO_ACIDS_COLUMNS = {
 }
 
 TEXT_FIELDS = {"id", "category", "description", "base_name", "preparation", "qualifiers"}
+VARIANT_FIELDS = ("id", "description", "preparation", "moisture_pct")
+
+# Medidas caseiras da POF/IBGE. Tabela independente da TACO: os códigos de
+# alimento são do IBGE e não correspondem aos `numero_alimento` da TACO.
+MEASURE_COLUMNS = {
+    "codigo_alimento": "pof_food_id",
+    "descricao_alimento": "food_description",
+    "codigo_preparacao": "preparation_code",
+    "descricao_preparacao": "preparation",
+    "codigo_medida": "measure_code",
+    "descricao_medida": "measure",
+    "codigo_medida_referencia": "reference_measure_code",
+    "descricao_medida_referencia": "reference_measure",
+    "quantidade_g": "grams",
+    "codigo_fonte": "source_code",
+    "descricao_fonte": "source_description",
+}
 
 # ---------------------------------------------------------------------------
 # Carregamento dos dados
@@ -143,6 +161,19 @@ df_fatty_acids = _load_csv("taco_acidos_graxos.csv", FATTY_ACIDS_COLUMNS)
 df_amino_acids = _load_csv("taco_aminoacidos.csv", AMINO_ACIDS_COLUMNS)
 
 
+def _load_measures() -> pd.DataFrame:
+    path = POF_DIR / "pof_medidas_caseiras.csv"
+    if not path.is_file():
+        raise FileNotFoundError(
+            f"Arquivo de dados não encontrado: {path}. "
+            "Execute 'python scripts/process_pof.py' para gerá-lo."
+        )
+    return pd.read_csv(path).rename(columns=MEASURE_COLUMNS)
+
+
+df_measures = _load_measures()
+
+
 def _fold(texto: str) -> str:
     """Minúsculas sem acentos, para busca insensível a acentuação."""
     return unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode().lower()
@@ -152,6 +183,20 @@ def _fold(texto: str) -> str:
 # no import: "acucar" precisa encontrar "açúcar".
 _searchable_descriptions = (
     df_composition["description"]
+    .str.normalize("NFKD")
+    .str.encode("ascii", "ignore")
+    .str.decode("ascii")
+    .str.lower()
+)
+_searchable_measure_foods = (
+    df_measures["food_description"]
+    .str.normalize("NFKD")
+    .str.encode("ascii", "ignore")
+    .str.decode("ascii")
+    .str.lower()
+)
+_searchable_measures = (
+    df_measures["measure"]
     .str.normalize("NFKD")
     .str.encode("ascii", "ignore")
     .str.decode("ascii")
@@ -282,7 +327,10 @@ def root():
             "GET  /categories/{name}",
             "GET  /foods",
             "GET  /preparations",
+            "GET  /measures",
+            "GET  /measures/types",
             "GET  /foods/{id}",
+            "GET  /foods/{id}/variants",
             "GET  /foods/{id}/fatty-acids",
             "GET  /foods/{id}/amino-acids",
             "POST /foods/compare",
@@ -293,7 +341,11 @@ def root():
 
 @app.get("/health", tags=["meta"])
 def health():
-    return {"status": "ok", "total_foods": len(df_composition)}
+    return {
+        "status": "ok",
+        "total_foods": len(df_composition),
+        "total_measures": len(df_measures),
+    }
 
 
 # -- Categorias --------------------------------------------------------------
@@ -330,6 +382,48 @@ def list_preparations():
         df_composition.groupby("preparation").size().reset_index(name="food_count")
     )
     return counts.sort_values("preparation").to_dict(orient="records")
+
+
+# -- Medidas caseiras (POF/IBGE) ----------------------------------------------
+
+
+@app.get("/measures", tags=["measures"])
+def list_measures(
+    search: str | None = Query(None, description="Search term for the POF food description"),
+    measure: str | None = Query(None, description="Exact measure name, e.g. 'colher de sopa'"),
+    skip: int = Query(0, ge=0, description="Number of items to skip"),
+    limit: int = Query(25, ge=1, le=100, description="Max items to return"),
+):
+    """Peso em gramas de medidas caseiras, da Tabela de Medidas Referidas (POF/IBGE).
+
+    Tabela independente da TACO: `pof_food_id` é o código do alimento no IBGE e
+    **não** corresponde ao `id` da TACO. Não há equivalência automática entre as
+    duas — veja a nota em `docs/dicionario-dados.md`.
+    """
+    filtered = df_measures
+    if search:
+        filtered = filtered[
+            _searchable_measure_foods.str.contains(_fold(search), na=False, regex=False)
+        ]
+    if measure:
+        filtered = filtered[_searchable_measures.loc[filtered.index] == _fold(measure)]
+
+    total = len(filtered)
+    page = filtered.iloc[skip : skip + limit]
+    return {
+        "total": total,
+        "skip": skip,
+        "limit": limit,
+        "measures": [_row_to_dict(row) for _, row in page.iterrows()],
+    }
+
+
+@app.get("/measures/types", tags=["measures"])
+def list_measure_types():
+    """Tipos de medida caseira e em quantos registros cada um aparece."""
+    counts = df_measures["measure"].value_counts().reset_index()
+    counts.columns = ["measure", "record_count"]
+    return counts.sort_values("measure").to_dict(orient="records")
 
 
 # -- Alimentos ----------------------------------------------------------------
@@ -375,6 +469,39 @@ def get_food(food_id: int):
             food[chave] = {k: v for k, v in row.items() if k not in TEXT_FIELDS}
 
     return food
+
+
+@app.get("/foods/{food_id}/variants", tags=["foods"])
+def get_food_variants(food_id: int):
+    """O mesmo alimento nas outras formas de preparo disponíveis na TACO.
+
+    Agrupa por `base_name` + `qualifiers` — "Arroz, tipo 1, cru" e "Arroz,
+    tipo 1, cozido" são variantes; "Arroz, integral, cru" não é.
+
+    Os valores continuam sendo por 100 g do alimento **como está**: cozinhar
+    incorpora água, então comparar 100 g de cru com 100 g de cozido mede
+    sobretudo a diferença de umidade, e não a retenção do nutriente. Por isso
+    `moisture_pct` acompanha cada variante, e a API não calcula retenção: a
+    TACO amostra cru e cozido de forma independente, sem fator de rendimento.
+    """
+    food = _get_food(food_id)
+    irmaos = df_composition[
+        (df_composition["base_name"] == food["base_name"])
+        & (df_composition["qualifiers"].fillna("") == (food["qualifiers"] or ""))
+        & (df_composition["id"] != food_id)
+    ]
+    return {
+        "id": food_id,
+        "base_name": food["base_name"],
+        "qualifiers": food["qualifiers"],
+        "preparation": food["preparation"],
+        "moisture_pct": food["moisture_pct"],
+        # _row_to_dict mantém o arredondamento e o NaN -> None do resto da API.
+        "variants": [
+            {k: v for k, v in _row_to_dict(row).items() if k in VARIANT_FIELDS}
+            for _, row in irmaos.iterrows()
+        ],
+    }
 
 
 @app.get("/foods/{food_id}/fatty-acids", tags=["foods"], responses={200: {"model": FattyAcidsOut}})

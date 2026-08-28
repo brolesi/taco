@@ -40,8 +40,13 @@ de banco de dados:
    (`COMPOSITION_COLUMNS` etc.). Mudanças de contrato devem ser refletidas em
    `docs/dicionario-dados.md` e registradas no `CHANGELOG.md`.
 
-`data/raw/pof/` guarda as tabelas da POF/IBGE como referência; nenhum pipeline
-as consome ainda.
+`scripts/process_pof.py` é o segundo pipeline, independente: lê
+`data/raw/pof/tabelamedidas_bd.xls` e gera
+`data/processed/pof/pof_medidas_caseiras.csv` (medidas caseiras em gramas).
+Os códigos de alimento do IBGE **não** correspondem aos da TACO e não há
+crosswalk entre as duas — não invente um por semelhança de nome (só 13% dos
+alimentos da POF têm base idêntica na TACO, e a maioria é ambígua quanto a
+variedade e preparo).
 
 ### Regras de domínio não óbvias
 

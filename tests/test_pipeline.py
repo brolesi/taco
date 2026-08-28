@@ -1,7 +1,12 @@
 """Testes do pipeline de processamento da planilha TACO."""
 
+import pandas as pd
 import pytest
 
+from scripts.process_pof import ARQUIVO_SAIDA as POF_ARQUIVO
+from scripts.process_pof import ENTRADA_PADRAO as POF_ENTRADA
+from scripts.process_pof import SAIDA_PADRAO as POF_SAIDA
+from scripts.process_pof import main as pof_main
 from scripts.process_taco import ENTRADA_PADRAO, SAIDA_PADRAO, facetar_descricao, main
 
 CSVS = ("taco_composicao.csv", "taco_acidos_graxos.csv", "taco_aminoacidos.csv")
@@ -35,3 +40,23 @@ def test_facetar_descricao():
         "cru",
         "bovina, acém, moída",
     )
+
+
+@pytest.mark.skipif(
+    not POF_ENTRADA.is_file(), reason="planilha da POF ausente em data/raw/pof/"
+)
+def test_csv_da_pof_e_reproduzivel(tmp_path):
+    assert pof_main(["--saida-dir", str(tmp_path)]) == 0
+    assert (tmp_path / POF_ARQUIVO).read_bytes() == (POF_SAIDA / POF_ARQUIVO).read_bytes()
+
+
+def test_pof_descarta_rodape_da_planilha():
+    # A última linha da planilha é a nota de fonte do IBGE, sem código de
+    # alimento: ela não pode virar registro.
+    df = pd.read_csv(POF_SAIDA / POF_ARQUIVO)
+    assert len(df) == 11801
+    assert df["codigo_alimento"].astype(str).str.fullmatch(r"\d{7}").all()
+
+
+def test_pof_entrada_inexistente_retorna_erro(tmp_path):
+    assert pof_main(["--entrada", str(tmp_path / "nao-existe.xls")]) == 1

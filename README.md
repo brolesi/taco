@@ -23,7 +23,7 @@ taco/
 ├── api/                  # API REST (FastAPI)
 ├── data/
 │   ├── raw/              # Fontes originais, imutáveis (TACO .xls, POF .xls)
-│   └── processed/taco/   # CSVs canônicos gerados pelo pipeline
+│   └── processed/         # CSVs canônicos gerados pelos pipelines (taco/, pof/)
 ├── docs/                 # Dicionário de dados
 ├── references/           # Documentos originais (PDFs) e guia de normalização
 ├── scripts/              # Pipeline de processamento
@@ -74,8 +74,11 @@ Os nomes de campo da API estão mapeados no
 | GET | `/categories` | Categorias e contagem de alimentos |
 | GET | `/categories/{nome}` | Alimentos de uma categoria |
 | GET | `/preparations` | Formas de preparo e contagem de alimentos |
+| GET | `/measures?search=&measure=` | Peso em gramas de medidas caseiras (POF) |
+| GET | `/measures/types` | Tipos de medida caseira e sua frequência |
 | GET | `/foods?search=&base_name=&preparation=&skip=&limit=` | Lista/busca paginada de alimentos (busca ignora acentos) |
 | GET | `/foods/{id}` | Composição completa de um alimento |
+| GET | `/foods/{id}/variants` | O mesmo alimento em outras formas de preparo |
 | GET | `/foods/{id}/fatty-acids` | Perfil de ácidos graxos |
 | GET | `/foods/{id}/amino-acids` | Perfil de aminoácidos |
 | POST | `/foods/compare` | Compara a composição de 2+ alimentos |
@@ -86,6 +89,7 @@ Exemplo:
 ```bash
 curl "http://127.0.0.1:8000/foods?search=arroz&limit=3"
 curl "http://127.0.0.1:8000/foods?base_name=feijao&preparation=cozido"
+curl "http://127.0.0.1:8000/measures?search=arroz&measure=colher%20de%20sopa"
 curl -X POST "http://127.0.0.1:8000/foods/sum" \
   -H "Content-Type: application/json" \
   -d '{"items": [{"id": 1, "grams": 150}, {"id": 2, "grams": 80}]}'
@@ -98,14 +102,17 @@ curl -X POST "http://127.0.0.1:8000/foods/sum" \
 | `data/processed/taco/taco_composicao.csv` | Composição centesimal, minerais e vitaminas | 597 |
 | `data/processed/taco/taco_acidos_graxos.csv` | Perfil de ácidos graxos | 423 |
 | `data/processed/taco/taco_aminoacidos.csv` | Perfil de aminoácidos | 26 |
+| `data/processed/pof/pof_medidas_caseiras.csv` | Medidas caseiras em gramas (POF/IBGE) | 11.801 |
 
 Detalhes de colunas, unidades e valores especiais (`Tr`, `NA`) no
 [dicionário de dados](docs/dicionario-dados.md). As decisões de normalização
 estão documentadas em
 [references/guia_normalizacao_taco.md](references/guia_normalizacao_taco.md).
 
-As tabelas da POF em `data/raw/pof/` são fontes originais de referência: ainda
-não há pipeline que as processe.
+As medidas caseiras da POF vivem em uma tabela independente: o código de
+alimento do IBGE não corresponde ao `id` da TACO, e o repositório não inventa
+essa ponte — veja
+[a nota no dicionário de dados](docs/dicionario-dados.md).
 
 ## Desenvolvimento
 
