@@ -3,6 +3,19 @@
 Este arquivo segue o formato [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.5.0] - não lançado
+
+### Adicionado
+
+- `GET /coverage`: quantos alimentos têm dado para cada nutriente, pior
+  cobertura primeiro. Mais da metade da TACO não tem vitamina A (42,7%) nem
+  colesterol (44,6%), e aminoácidos existem para só 26 alimentos — informação
+  que decide se a tabela serve para um uso e que a publicação original não
+  apresenta assim. A mesma cobertura está no dicionário de dados.
+- `scripts/build_sqlite.py` e o workflow `release.yml`: cada release passa a
+  ter um `taco.sqlite` anexado, com as quatro tabelas e uma tabela de
+  `metadados` com procedência. O arquivo não é versionado.
+
 ## [1.4.0] - 2026-08-28
 
 ### Adicionado

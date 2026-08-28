@@ -232,3 +232,16 @@ def test_variants_nao_mistura_qualificadores_diferentes():
 
 def test_variants_de_alimento_inexistente():
     assert client.get("/foods/99999/variants").status_code == 404
+
+
+def test_coverage_lista_pior_cobertura_primeiro():
+    body = client.get("/coverage").json()
+    assert body["total_foods"] == 597
+    pcts = [c["coverage_pct"] for c in body["composition"]]
+    assert pcts == sorted(pcts)
+    por_campo = {c["field"]: c for c in body["composition"]}
+    # Metade da TACO não tem vitamina A; quase tudo tem energia.
+    assert por_campo["rae_mcg"]["coverage_pct"] < 50
+    assert por_campo["energy_kcal"]["coverage_pct"] > 98
+    assert por_campo["rae_mcg"]["with_data"] < por_campo["energy_kcal"]["with_data"]
+    assert body["tables"]["amino_acids"]["foods"] == 26

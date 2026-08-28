@@ -16,7 +16,7 @@ import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field, create_model
 
-API_VERSION = "1.4.0"
+API_VERSION = "1.5.0"
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "processed" / "taco"
 POF_DIR = Path(__file__).resolve().parent.parent / "data" / "processed" / "pof"
@@ -323,6 +323,7 @@ def root():
         "docs": "/docs",
         "endpoints": [
             "GET  /health",
+            "GET  /coverage",
             "GET  /categories",
             "GET  /categories/{name}",
             "GET  /foods",
@@ -336,6 +337,41 @@ def root():
             "POST /foods/compare",
             "POST /foods/sum",
         ],
+    }
+
+
+@app.get("/coverage", tags=["meta"])
+def coverage():
+    """Quantos alimentos têm dado para cada nutriente.
+
+    A TACO não mediu tudo para todos os alimentos: mais da metade da tabela não
+    tem vitamina A nem colesterol, por exemplo. Saber disso antes de escolher a
+    fonte de dados é mais útil do que descobrir com o campo vazio na resposta —
+    é a mesma razão pela qual `/foods/sum` devolve `missing_values`.
+    """
+    total = len(df_composition)
+    campos = [
+        {
+            "field": campo,
+            "with_data": int(df_composition[campo].notna().sum()),
+            "coverage_pct": round(df_composition[campo].notna().sum() / total * 100, 1),
+        }
+        for campo in _nutrient_cols(df_composition)
+    ]
+    return {
+        "total_foods": total,
+        # Pior cobertura primeiro: é o que decide se a TACO serve para o uso.
+        "composition": sorted(campos, key=lambda c: c["coverage_pct"]),
+        "tables": {
+            "fatty_acids": {
+                "foods": len(df_fatty_acids),
+                "coverage_pct": round(len(df_fatty_acids) / total * 100, 1),
+            },
+            "amino_acids": {
+                "foods": len(df_amino_acids),
+                "coverage_pct": round(len(df_amino_acids) / total * 100, 1),
+            },
+        },
     }
 
 

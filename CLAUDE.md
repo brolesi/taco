@@ -48,6 +48,10 @@ crosswalk entre as duas — não invente um por semelhança de nome (só 13% dos
 alimentos da POF têm base idêntica na TACO, e a maioria é ambígua quanto a
 variedade e preparo).
 
+`scripts/build_sqlite.py` empacota os CSVs processados em `taco.sqlite`, que
+**não** é versionado (está no `.gitignore`): é gerado e anexado a cada release
+pelo workflow `.github/workflows/release.yml`.
+
 ### Regras de domínio não óbvias
 
 - **Categoria dos alimentos**: derivada das linhas separadoras das abas da

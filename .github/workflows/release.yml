@@ -1,0 +1,32 @@
+name: Release
+
+# Anexa o SQLite ao release assim que ele é publicado. Não gera release nem
+# tag: quem decide o que é uma versão continua sendo quem cria o release.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  sqlite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Gerar o SQLite
+        run: python scripts/build_sqlite.py --saida dist/taco.sqlite
+
+      - name: Anexar ao release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" dist/taco.sqlite --clobber

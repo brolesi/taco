@@ -150,6 +150,29 @@ Perfil de aminoácidos, disponível apenas para um subconjunto de alimentos.
 | `prolina_g` | g | Prolina | `proline_g` |
 | `serina_g` | g | Serina | `serine_g` |
 
+## Cobertura dos dados
+
+A TACO não analisou todos os nutrientes em todos os alimentos. Saber o que
+falta **antes** de escolher a fonte evita descobrir com o campo vazio no meio
+de uma análise. Números da versão atual (`GET /coverage` devolve isso ao vivo):
+
+| Nutriente | Alimentos com dado | Cobertura |
+|---|---|---|
+| `RAE_mcg` / `RE_mcg` (vitamina A) | 255 | 42,7% |
+| `colesterol_mg` | 266 | 44,6% |
+| `retinol_mcg` | 273 | 45,7% |
+| `fibra_g` | 362 | 60,6% |
+| `vitamina_c_mg` | 369 | 61,8% |
+| `niacina_mg` | 565 | 94,6% |
+| `energia_kcal`, `energia_kj` | 591 | 99,0% |
+
+As tabelas complementares cobrem menos ainda: ácidos graxos existem para 423
+alimentos (70,9%) e aminoácidos para apenas 26 (4,4%).
+
+Um valor ausente (NaN) significa "não analisado", e é diferente de `Tr`
+(traço, gravado como `1e-05`) e de zero. Por isso `/foods/sum` devolve
+`missing_values` em vez de somar ausência como zero.
+
 ## `pof_medidas_caseiras.csv` (11.801 registros)
 
 Gerado por [`scripts/process_pof.py`](../scripts/process_pof.py) a partir de

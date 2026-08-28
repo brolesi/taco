@@ -74,6 +74,7 @@ Os nomes de campo da API estão mapeados no
 |---|---|---|
 | GET | `/` | Metadados da API |
 | GET | `/health` | Verificação de saúde |
+| GET | `/coverage` | Quantos alimentos têm dado para cada nutriente |
 | GET | `/categories` | Categorias e contagem de alimentos |
 | GET | `/categories/{nome}` | Alimentos de uma categoria |
 | GET | `/preparations` | Formas de preparo e contagem de alimentos |
@@ -107,8 +108,18 @@ curl -X POST "http://127.0.0.1:8000/foods/sum" \
 | `data/processed/taco/taco_aminoacidos.csv` | Perfil de aminoácidos | 26 |
 | `data/processed/pof/pof_medidas_caseiras.csv` | Medidas caseiras em gramas (POF/IBGE) | 11.801 |
 
+Cada release traz também um **`taco.sqlite`** anexado, com as quatro tabelas em
+um arquivo só — para consultar em SQL sem instalar Python nem subir a API:
+
+```sql
+SELECT descricao, ferro_mg FROM taco_composicao
+WHERE preparo = 'cozido' ORDER BY ferro_mg DESC LIMIT 5;
+```
+
 Detalhes de colunas, unidades e valores especiais (`Tr`, `NA`) no
-[dicionário de dados](docs/dicionario-dados.md). As decisões de normalização
+[dicionário de dados](docs/dicionario-dados.md). A
+[cobertura por nutriente](docs/dicionario-dados.md#cobertura-dos-dados) diz o
+que a TACO deixou de medir. As decisões de normalização
 estão documentadas em
 [references/guia_normalizacao_taco.md](references/guia_normalizacao_taco.md).
 

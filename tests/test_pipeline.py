@@ -3,6 +3,7 @@
 import pandas as pd
 import pytest
 
+from scripts.build_sqlite import TABELAS, construir
 from scripts.process_pof import ARQUIVO_SAIDA as POF_ARQUIVO
 from scripts.process_pof import ENTRADA_PADRAO as POF_ENTRADA
 from scripts.process_pof import SAIDA_PADRAO as POF_SAIDA
@@ -60,3 +61,17 @@ def test_pof_descarta_rodape_da_planilha():
 
 def test_pof_entrada_inexistente_retorna_erro(tmp_path):
     assert pof_main(["--entrada", str(tmp_path / "nao-existe.xls")]) == 1
+
+
+def test_sqlite_reune_os_quatro_csvs(tmp_path):
+    import sqlite3
+
+    destino = construir(tmp_path / "taco.sqlite")
+    with sqlite3.connect(destino) as conn:
+        tabelas = {n for (n,) in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+        assert tabelas == set(TABELAS) | {"metadados"}
+        assert conn.execute("SELECT count(*) FROM taco_composicao").fetchone()[0] == 597
+        assert conn.execute("SELECT count(*) FROM pof_medidas_caseiras").fetchone()[0] == 11801
+        # A procedência viaja junto: quem baixa só o arquivo não tem o README.
+        meta = dict(conn.execute("SELECT chave, valor FROM metadados"))
+        assert "TACO" in meta["fonte_taco"] and meta["repositorio"].startswith("https://")
