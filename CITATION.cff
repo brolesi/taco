@@ -6,6 +6,15 @@ authors:
   - family-names: Brolesi
     given-names: Fabio Fogliarini
 repository-code: "https://github.com/brolesi/taco"
+url: "https://brolesi.github.io/taco/"
+doi: 10.5281/zenodo.22145839
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.22145839
+    description: DOI conceitual — resolve sempre para a versão mais recente
+  - type: doi
+    value: 10.5281/zenodo.22145840
+    description: DOI da versão 1.6.0
 license: MIT
 version: 1.6.0
 date-released: 2026-08-28

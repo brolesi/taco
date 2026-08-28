@@ -3,6 +3,14 @@
 Este arquivo segue o formato [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [Não lançado]
+
+### Adicionado
+
+- DOI do Zenodo (`10.5281/zenodo.22145839`, conceitual) no `CITATION.cff`, no
+  BibTeX do README e como badge. Cada release passa a ser citável por DOI
+  próprio; a 1.6.0 é `10.5281/zenodo.22145840`.
+
 ## [1.6.0] - 2026-08-28
 
 ### Adicionado

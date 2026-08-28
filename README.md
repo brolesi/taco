@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/brolesi/taco/actions/workflows/ci.yml/badge.svg)](https://github.com/brolesi/taco/actions/workflows/ci.yml)
 [![Licença: MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-blue.svg)](LICENSE)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22145839.svg)](https://doi.org/10.5281/zenodo.22145839)
 
 Dados normalizados e API REST da **Tabela Brasileira de Composição de Alimentos
 (TACO, 4ª edição, NEPA/UNICAMP)**, acompanhados de fontes complementares
@@ -186,17 +187,21 @@ sopa", "copo", "fatia") a quantidades em gramas ou mililitros.
 
 ## Como citar
 
-Os metadados de citação também estão em [`CITATION.cff`](CITATION.cff)
-(botão "Cite this repository" no GitHub).
+Cada release recebe um DOI do Zenodo. O DOI abaixo é o **conceitual**: ele
+resolve sempre para a versão mais recente. Para citar uma versão específica,
+use o DOI dela na
+[página do Zenodo](https://doi.org/10.5281/zenodo.22145839). Os metadados
+também estão em [`CITATION.cff`](CITATION.cff) (botão "Cite this repository"
+no GitHub).
 
 ```bibtex
 @misc{brolesi2026taco,
   author       = {Brolesi, F. F.},
   title        = {{TACO} - Tabela Brasileira de Composição de Alimentos: Repositório para acesso facilitado aos dados da {TACO} ({NEPA/UNICAMP}) e {POF} ({IBGE})},
   year         = {2026},
-  publisher    = {GitHub},
-  url          = {https://github.com/brolesi/taco},
-  note         = {Acessado em: [data de acesso]}
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.22145839},
+  url          = {https://doi.org/10.5281/zenodo.22145839}
 }
 ```
 
