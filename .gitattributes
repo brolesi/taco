@@ -4,6 +4,10 @@
 # Scripts de lote do Windows exigem CRLF.
 *.bat text eol=crlf
 
+# CSVs canônicos: bytes idênticos no repositório, no checkout e na saída do
+# pipeline (o teste de reprodutibilidade compara byte a byte).
+data/processed/**/*.csv -text
+
 # Fontes originais binárias.
 *.xls binary
 *.pdf binary

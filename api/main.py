@@ -16,7 +16,7 @@ import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field, create_model
 
-API_VERSION = "1.2.0"
+API_VERSION = "1.3.0"
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "processed" / "taco"
 
@@ -32,6 +32,9 @@ COMPOSITION_COLUMNS = {
     "numero_alimento": "id",
     "categoria": "category",
     "descricao": "description",
+    "base": "base_name",
+    "preparo": "preparation",
+    "qualificadores": "qualifiers",
     "umidade_pct": "moisture_pct",
     "energia_kcal": "energy_kcal",
     "energia_kj": "energy_kj",
@@ -112,7 +115,7 @@ AMINO_ACIDS_COLUMNS = {
     "serina_g": "serine_g",
 }
 
-TEXT_FIELDS = {"id", "category", "description"}
+TEXT_FIELDS = {"id", "category", "description", "base_name", "preparation", "qualifiers"}
 
 # ---------------------------------------------------------------------------
 # Carregamento dos dados
@@ -149,6 +152,13 @@ def _fold(texto: str) -> str:
 # no import: "acucar" precisa encontrar "açúcar".
 _searchable_descriptions = (
     df_composition["description"]
+    .str.normalize("NFKD")
+    .str.encode("ascii", "ignore")
+    .str.decode("ascii")
+    .str.lower()
+)
+_searchable_bases = (
+    df_composition["base_name"]
     .str.normalize("NFKD")
     .str.encode("ascii", "ignore")
     .str.decode("ascii")
@@ -192,7 +202,14 @@ def _find_row(df: pd.DataFrame, food_id: int) -> dict | None:
 # Modelos de resposta (só documentam o OpenAPI; não filtram as respostas)
 # ---------------------------------------------------------------------------
 
-_TIPOS_TEXTO = {"id": (int, ...), "category": (str, ...), "description": (str, ...)}
+_TIPOS_TEXTO = {
+    "id": (int, ...),
+    "category": (str, ...),
+    "description": (str, ...),
+    "base_name": (str, ...),
+    "preparation": (str | None, None),
+    "qualifiers": (str | None, None),
+}
 
 
 def _model_from_columns(name: str, columns: dict[str, str], *, texto: bool = True, **extra):
@@ -264,6 +281,7 @@ def root():
             "GET  /categories",
             "GET  /categories/{name}",
             "GET  /foods",
+            "GET  /preparations",
             "GET  /foods/{id}",
             "GET  /foods/{id}/fatty-acids",
             "GET  /foods/{id}/amino-acids",
@@ -305,12 +323,26 @@ def get_category(name: str):
     }
 
 
+@app.get("/preparations", tags=["categories"])
+def list_preparations():
+    """Formas de preparo reconhecidas e quantos alimentos há em cada uma."""
+    counts = (
+        df_composition.groupby("preparation").size().reset_index(name="food_count")
+    )
+    return counts.sort_values("preparation").to_dict(orient="records")
+
+
 # -- Alimentos ----------------------------------------------------------------
 
 
 @app.get("/foods", tags=["foods"])
 def list_foods(
     search: str | None = Query(None, description="Search term for food description"),
+    base_name: str | None = Query(None, description="Exact base food name, e.g. 'arroz'"),
+    preparation: str | None = Query(
+        None,
+        description="Preparation: cru, cozido, frito, grelhado, assado, refogado, torrado",
+    ),
     skip: int = Query(0, ge=0, description="Number of items to skip"),
     limit: int = Query(25, ge=1, le=100, description="Max items to return"),
 ):
@@ -319,6 +351,10 @@ def list_foods(
         filtered = filtered[
             _searchable_descriptions.str.contains(_fold(search), na=False, regex=False)
         ]
+    if base_name:
+        filtered = filtered[_searchable_bases.loc[filtered.index] == _fold(base_name)]
+    if preparation:
+        filtered = filtered[filtered["preparation"] == _fold(preparation)]
     total = len(filtered)
     page = filtered.iloc[skip : skip + limit][["id", "category", "description"]]
     return {

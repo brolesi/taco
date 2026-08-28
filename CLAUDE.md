@@ -32,7 +32,9 @@ de banco de dados:
    exporta `data/processed/taco/taco_{composicao,acidos_graxos,aminoacidos}.csv`
    (colunas pt-BR snake_case). Os CSVs processados são versionados e devem ser
    **reproduzíveis byte a byte** pelo pipeline — nunca editá-los à mão; se mudar o
-   pipeline, regenere e commite os CSVs junto.
+   pipeline, regenere e commite os CSVs junto. Eles usam LF em qualquer SO
+   (`lineterminator="''' + BS + '''n"` no `to_csv` mais `-text` no `.gitattributes`);
+   não reverta isso, ou a saída passa a depender do sistema operacional.
 3. **`api/main.py`** — FastAPI que carrega os 3 CSVs em DataFrames no import do
    módulo e traduz as colunas para o contrato público em inglês
    (`COMPOSITION_COLUMNS` etc.). Mudanças de contrato devem ser refletidas em

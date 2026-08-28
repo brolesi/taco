@@ -73,7 +73,8 @@ Os nomes de campo da API estão mapeados no
 | GET | `/health` | Verificação de saúde |
 | GET | `/categories` | Categorias e contagem de alimentos |
 | GET | `/categories/{nome}` | Alimentos de uma categoria |
-| GET | `/foods?search=&skip=&limit=` | Lista/busca paginada de alimentos (busca ignora acentos) |
+| GET | `/preparations` | Formas de preparo e contagem de alimentos |
+| GET | `/foods?search=&base_name=&preparation=&skip=&limit=` | Lista/busca paginada de alimentos (busca ignora acentos) |
 | GET | `/foods/{id}` | Composição completa de um alimento |
 | GET | `/foods/{id}/fatty-acids` | Perfil de ácidos graxos |
 | GET | `/foods/{id}/amino-acids` | Perfil de aminoácidos |
@@ -84,6 +85,7 @@ Exemplo:
 
 ```bash
 curl "http://127.0.0.1:8000/foods?search=arroz&limit=3"
+curl "http://127.0.0.1:8000/foods?base_name=feijao&preparation=cozido"
 curl -X POST "http://127.0.0.1:8000/foods/sum" \
   -H "Content-Type: application/json" \
   -d '{"items": [{"id": 1, "grams": 150}, {"id": 2, "grams": 80}]}'

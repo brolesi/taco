@@ -37,6 +37,19 @@ com os rótulos exatos da publicação:
 | Produtos açucarados | 20 |
 | Verduras, hortaliças e derivados | 99 |
 
+## Facetas da descrição
+
+As descrições da TACO são facetadas por vírgula ("Arroz, integral, cozido"). O
+pipeline separa o primeiro termo como `base`, reconhece uma forma de preparo
+entre os demais (canonizada: "crua" e "cru" viram `cru`) e preserva o restante
+em `qualificadores`. Apenas `taco_composicao.csv` recebe essas colunas — as
+outras abas repetem as mesmas descrições.
+
+Os sete preparos reconhecidos e sua cobertura: `cru` (228), `cozido` (57),
+`frito` (25), `grelhado` (22), `assado` (19), `refogado` (8), `torrado` (5).
+Os 233 alimentos restantes não declaram preparo na descrição e ficam com
+`preparo` vazio.
+
 ## `taco_composicao.csv` (597 alimentos)
 
 Composição centesimal, minerais e vitaminas. A coluna "Campo na API" indica o nome
@@ -47,6 +60,9 @@ exposto pela API REST.
 | `numero_alimento` | — | Identificador do alimento na TACO | `id` |
 | `descricao` | — | Descrição do alimento | `description` |
 | `categoria` | — | Categoria do alimento | `category` |
+| `base` | — | Alimento-base (1º termo da descrição) | `base_name` |
+| `preparo` | — | Forma de preparo canônica, se houver | `preparation` |
+| `qualificadores` | — | Demais termos da descrição, na ordem original | `qualifiers` |
 | `umidade_pct` | % | Umidade | `moisture_pct` |
 | `energia_kcal` | kcal | Energia | `energy_kcal` |
 | `energia_kj` | kJ | Energia | `energy_kj` |

@@ -3,6 +3,25 @@
 Este arquivo segue o formato [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.3.0] - não lançado
+
+### Adicionado
+
+- **Facetas da descrição** nos CSVs e na API: `base` (`base_name`), `preparo`
+  (`preparation`) e `qualificadores` (`qualifiers`). As descrições da TACO já
+  eram facetadas por vírgula ("Arroz, integral, cozido"); o pipeline agora as
+  separa e canoniza a forma de preparo ("crua" e "cru" viram `cru`), cobrindo
+  364 dos 597 alimentos.
+- Filtros `base_name` e `preparation` em `GET /foods` (ambos insensíveis a
+  acento e caixa) e endpoint `GET /preparations` com a contagem por preparo.
+
+### Corrigido
+
+- Os CSVs processados passaram a usar LF em qualquer sistema operacional. O
+  `to_csv` seguia `os.linesep`, então o mesmo pipeline gerava bytes diferentes
+  no Windows e no Linux; a comparação byte a byte só não acusava porque a
+  normalização do Git desfazia a diferença no caminho de volta.
+
 ## [1.2.0] - 2026-08-28
 
 ### Adicionado

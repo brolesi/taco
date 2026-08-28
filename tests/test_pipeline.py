@@ -2,7 +2,7 @@
 
 import pytest
 
-from scripts.process_taco import ENTRADA_PADRAO, SAIDA_PADRAO, main
+from scripts.process_taco import ENTRADA_PADRAO, SAIDA_PADRAO, facetar_descricao, main
 
 CSVS = ("taco_composicao.csv", "taco_acidos_graxos.csv", "taco_aminoacidos.csv")
 
@@ -20,3 +20,18 @@ def test_csvs_versionados_sao_reproduziveis(tmp_path):
 
 def test_entrada_inexistente_retorna_erro(tmp_path):
     assert main(["--entrada", str(tmp_path / "nao-existe.xls")]) == 1
+
+
+def test_facetar_descricao():
+    assert facetar_descricao("Arroz, integral, cozido") == ("Arroz", "cozido", "integral")
+    # Gênero é canonizado: "crua" e "cru" devem virar o mesmo preparo.
+    assert facetar_descricao("Alface, crespa, crua")[1] == "cru"
+    assert facetar_descricao("Arroz, tipo 1, cru")[1] == "cru"
+    # Sem preparo declarado e sem qualificadores.
+    assert facetar_descricao("Acarajé") == ("Acarajé", None, None)
+    # Vários qualificadores preservam a ordem original.
+    assert facetar_descricao("Carne, bovina, acém, moída, crua") == (
+        "Carne",
+        "cru",
+        "bovina, acém, moída",
+    )

@@ -50,6 +50,54 @@ CATEGORIAS_PLANILHA = [
 ]
 
 
+# Formas de preparo reconhecidas nas descrições, mapeadas para uma forma
+# canônica (as descrições variam em gênero: "cru"/"crua"). Nenhuma descrição
+# da TACO contém dois preparos, então a primeira ocorrência é suficiente.
+PREPAROS = {
+    "cru": "cru",
+    "crua": "cru",
+    "cozido": "cozido",
+    "cozida": "cozido",
+    "pré-cozido": "cozido",
+    "pré-cozida": "cozido",
+    "frito": "frito",
+    "frita": "frito",
+    "assado": "assado",
+    "assada": "assado",
+    "grelhado": "grelhado",
+    "grelhada": "grelhado",
+    "refogado": "refogado",
+    "refogada": "refogado",
+    "torrado": "torrado",
+    "torrada": "torrado",
+    "tostado": "torrado",
+    "tostada": "torrado",
+}
+
+
+def facetar_descricao(descricao: str) -> tuple[str, str | None, str | None]:
+    """Separa a descrição da TACO em (base, preparo, qualificadores).
+
+    As descrições são facetadas por vírgula ("Arroz, integral, cozido"): o
+    primeiro termo é o alimento-base, um dos demais pode ser uma forma de
+    preparo conhecida (canonizada por ``PREPAROS``) e o restante são
+    qualificadores, preservados na ordem original.
+    """
+    termos = [t.strip() for t in descricao.split(",")]
+    base, resto = termos[0], termos[1:]
+
+    preparo = None
+    qualificadores = []
+    for termo in resto:
+        canonico = PREPAROS.get(termo.lower())
+        if canonico is not None and preparo is None:
+            preparo = canonico
+        else:
+            qualificadores.append(termo)
+
+    return base, preparo, ", ".join(qualificadores) or None
+
+
 @dataclass
 class AbaConfig:
     """Configuração de processamento de uma aba da planilha."""
@@ -59,6 +107,9 @@ class AbaConfig:
     arquivo_saida: str
     coluna_duplicada: str = "numero_alimento_2"
     linhas_cabecalho: int = 3
+    # Só a aba de composição recebe as facetas: é a entidade "alimento" da API;
+    # as outras repetem as mesmas descrições.
+    facetar: bool = False
 
 
 # A aba de composição deve ser a primeira: ela fornece o mapa id -> categoria
@@ -67,6 +118,7 @@ ABAS: list[AbaConfig] = [
     AbaConfig(
         sheet_name="CMVCol taco3",
         arquivo_saida="taco_composicao.csv",
+        facetar=True,
         colunas=[
             "numero_alimento",
             "descricao",
@@ -200,11 +252,19 @@ def processar_aba(
     for col in colunas_numericas:
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
+    if config.facetar:
+        facetas = df["descricao"].map(facetar_descricao)
+        df["base"] = [f[0] for f in facetas]
+        df["preparo"] = [f[1] for f in facetas]
+        df["qualificadores"] = [f[2] for f in facetas]
+
     # Mantém 'categoria' como última coluna.
     df = df[[c for c in df.columns if c != "categoria"] + ["categoria"]]
 
     saida_csv = saida_dir / config.arquivo_saida
-    df.to_csv(saida_csv, index=False, encoding="utf-8")
+    # lineterminator fixo: sem isso o pandas usa os.linesep e os CSVs sairiam
+    # com CRLF no Windows e LF no Linux, quebrando a comparação byte a byte.
+    df.to_csv(saida_csv, index=False, encoding="utf-8", lineterminator="\n")
     logging.info("Exportado: %s (%d linhas)", saida_csv, len(df))
     return df
 

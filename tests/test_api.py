@@ -149,3 +149,35 @@ def test_sum_reporta_nutrientes_sem_dado():
     body = client.post("/foods/sum", json={"items": [{"id": 1, "grams": 100}]}).json()
     assert body["missing_values"]["vitamin_c_mg"] == 1
     assert "energy_kcal" not in body["missing_values"]
+
+
+def test_facetas_no_alimento():
+    body = client.get("/foods/1").json()
+    assert body["base_name"] == "Arroz"
+    assert body["preparation"] == "cozido"
+    assert body["qualifiers"] == "integral"
+
+
+def test_list_preparations():
+    preparos = {p["preparation"]: p["food_count"] for p in client.get("/preparations").json()}
+    assert preparos["cru"] > preparos["cozido"] > 0
+    assert None not in preparos  # alimentos sem preparo ficam fora da contagem
+
+
+def test_filtro_por_base_e_preparo():
+    body = client.get("/foods", params={"base_name": "arroz", "preparation": "cozido"}).json()
+    assert body["total"] > 0
+    assert all("cozido" in f["description"].lower() for f in body["foods"])
+    assert all(f["description"].lower().startswith("arroz") for f in body["foods"])
+
+
+def test_filtro_por_base_ignora_acentos():
+    com = client.get("/foods", params={"base_name": "feijão"}).json()["total"]
+    sem = client.get("/foods", params={"base_name": "feijao"}).json()["total"]
+    assert com == sem > 0
+
+
+def test_facetas_nao_entram_na_soma():
+    totais = client.post("/foods/sum", json={"items": [{"id": 1, "grams": 100}]}).json()
+    assert "base_name" not in totais["total_nutrients"]
+    assert "preparation" not in totais["total_nutrients"]
