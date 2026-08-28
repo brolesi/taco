@@ -3,7 +3,7 @@
 Este arquivo segue o formato [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
-## [1.6.0] - não lançado
+## [1.6.0] - 2026-08-28
 
 ### Adicionado
 
@@ -161,6 +161,7 @@ endpoints referem-se ao protótipo anterior, que não chegou a ser versionado.
   pipeline de processamento (`notebooks/01-process-taco.py`) e CSVs
   normalizados em `data/processed/taco/`. A API REST só veio na 1.1.0.
 
+[1.6.0]: https://github.com/brolesi/taco/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/brolesi/taco/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/brolesi/taco/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/brolesi/taco/compare/v1.2.0...v1.3.0
