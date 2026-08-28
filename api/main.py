@@ -14,9 +14,10 @@ from pathlib import Path
 
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, create_model
 
-API_VERSION = "1.6.0"
+API_VERSION = "1.7.0"
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "processed" / "taco"
 POF_DIR = Path(__file__).resolve().parent.parent / "data" / "processed" / "pof"
@@ -310,6 +311,17 @@ app = FastAPI(
         "NEPA/UNICAMP). All nutrient values refer to 100 g of edible portion."
     ),
     version=API_VERSION,
+)
+
+
+# Dados públicos e somente-leitura, sem credenciais: liberar qualquer origem é
+# o que permite consumir a API de um front-end. É o mesmo cabeçalho que o
+# GitHub Pages já devolve na versão estática.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
 )
 
 

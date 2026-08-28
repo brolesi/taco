@@ -14,7 +14,7 @@ identifiers:
     description: DOI conceitual — resolve sempre para a versão mais recente
   - type: doi
     value: 10.5281/zenodo.22145840
-    description: DOI da versão 1.6.0
+    description: DOI da versão 1.6.0 (cada release recebe o seu)
 license: MIT
-version: 1.6.0
+version: 1.7.0
 date-released: 2026-08-28

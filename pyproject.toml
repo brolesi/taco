@@ -1,6 +1,6 @@
 [project]
 name = "taco"
-version = "1.6.0"
+version = "1.7.0"
 description = "Dados normalizados e API REST da Tabela Brasileira de Composição de Alimentos (TACO)"
 readme = "README.md"
 requires-python = ">=3.10"

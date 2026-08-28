@@ -3,13 +3,25 @@
 Este arquivo segue o formato [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
-## [Não lançado]
+## [1.7.0] - 2026-08-28
 
 ### Adicionado
 
 - DOI do Zenodo (`10.5281/zenodo.22145839`, conceitual) no `CITATION.cff`, no
   BibTeX do README e como badge. Cada release passa a ser citável por DOI
   próprio; a 1.6.0 é `10.5281/zenodo.22145840`.
+- CORS liberado na API dinâmica (`GET`/`POST`, qualquer origem): dados públicos
+  e somente-leitura, o mesmo cabeçalho que o GitHub Pages já devolve na versão
+  estática. Sem isso, quem sobe a API local não consegue consumi-la de um
+  front-end.
+- O CI passou a rodar também no Windows. O teste de reprodutibilidade compara
+  bytes, e é no Windows que a quebra de linha nativa difere — sem essa matriz,
+  reverter o `lineterminator` do pipeline passaria despercebido.
+
+### Alterado
+
+- `pandas` e `xlrd` ganharam teto de major em `requirements.txt`: são eles que
+  determinam os bytes dos CSVs gerados.
 
 ## [1.6.0] - 2026-08-28
 
@@ -169,6 +181,7 @@ endpoints referem-se ao protótipo anterior, que não chegou a ser versionado.
   pipeline de processamento (`notebooks/01-process-taco.py`) e CSVs
   normalizados em `data/processed/taco/`. A API REST só veio na 1.1.0.
 
+[1.7.0]: https://github.com/brolesi/taco/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/brolesi/taco/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/brolesi/taco/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/brolesi/taco/compare/v1.3.0...v1.4.0

@@ -245,3 +245,15 @@ def test_coverage_lista_pior_cobertura_primeiro():
     assert por_campo["energy_kcal"]["coverage_pct"] > 98
     assert por_campo["rae_mcg"]["with_data"] < por_campo["energy_kcal"]["with_data"]
     assert body["tables"]["amino_acids"]["foods"] == 26
+
+
+def test_cors_liberado_para_front_end():
+    # Dados públicos e somente-leitura: qualquer origem pode consumir.
+    resp = client.get("/foods/1", headers={"Origin": "https://exemplo.com"})
+    assert resp.headers["access-control-allow-origin"] == "*"
+    preflight = client.options(
+        "/foods/sum",
+        headers={"Origin": "https://exemplo.com", "Access-Control-Request-Method": "POST"},
+    )
+    assert preflight.status_code == 200
+    assert "POST" in preflight.headers["access-control-allow-methods"]
