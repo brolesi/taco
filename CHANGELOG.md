@@ -3,6 +3,29 @@
 Este arquivo segue o formato [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.2.0] - 2026-08-27
+
+### Adicionado
+
+- `/foods/sum` passou a devolver `missing_values`: quantos itens não tinham
+  valor para cada nutriente. Dado ausente na TACO nunca entrou na soma, mas o
+  total aparentava ser exato quando era parcial.
+- Testes do pipeline (`tests/test_pipeline.py`): os CSVs versionados em
+  `data/processed/taco/` são comparados byte a byte com a saída do pipeline.
+
+### Alterado
+
+- A busca em `/foods?search=` ignora acentuação: `acucar` encontra `açúcar`.
+- `/docs` passou a documentar o schema das respostas de `/foods/{id}`,
+  `/foods/{id}/fatty-acids`, `/foods/{id}/amino-acids` e `/foods/compare`
+  (modelos gerados a partir dos mapas de colunas; as respostas em si não mudam).
+
+### Removido
+
+- `data/interim/taco/` — exportações legadas (separador `;`, decimal com
+  vírgula) que nenhum código consumia. Continuam disponíveis no histórico do
+  Git.
+
 ## [1.1.0] - 2026-07-09
 
 ### Corrigido

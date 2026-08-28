@@ -38,8 +38,8 @@ de banco de dados:
    (`COMPOSITION_COLUMNS` etc.). Mudanças de contrato devem ser refletidas em
    `docs/dicionario-dados.md` e registradas no `CHANGELOG.md`.
 
-`data/interim/taco/` contém exportações legadas (separador `;`, vírgula decimal)
-mantidas só por referência histórica — nada as consome.
+`data/raw/pof/` guarda as tabelas da POF/IBGE como referência; nenhum pipeline
+as consome ainda.
 
 ### Regras de domínio não óbvias
 

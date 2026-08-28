@@ -75,6 +75,14 @@ def test_list_foods_search_regex_chars_are_literal():
     assert resp.json()["total"] == 0
 
 
+def test_list_foods_search_ignora_acentos():
+    # "acucar" deve encontrar "açúcar".
+    sem_acento = client.get("/foods", params={"search": "acucar", "limit": 100}).json()
+    com_acento = client.get("/foods", params={"search": "açúcar", "limit": 100}).json()
+    assert sem_acento["total"] > 0
+    assert [f["id"] for f in sem_acento["foods"]] == [f["id"] for f in com_acento["foods"]]
+
+
 def test_get_food():
     resp = client.get("/foods/1")
     assert resp.status_code == 200
@@ -133,3 +141,11 @@ def test_sum_rejects_empty_items():
 def test_sum_rejects_non_positive_grams():
     resp = client.post("/foods/sum", json={"items": [{"id": 1, "grams": 0}]})
     assert resp.status_code == 422
+
+
+def test_sum_reporta_nutrientes_sem_dado():
+    # O alimento 1 não tem valor de vitamina C na TACO: o total não deve
+    # contá-lo como zero sem avisar.
+    body = client.post("/foods/sum", json={"items": [{"id": 1, "grams": 100}]}).json()
+    assert body["missing_values"]["vitamin_c_mg"] == 1
+    assert "energy_kcal" not in body["missing_values"]

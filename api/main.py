@@ -9,13 +9,14 @@ contrato público da API.
 from __future__ import annotations
 
 import math
+import unicodedata
 from pathlib import Path
 
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, create_model
 
-API_VERSION = "1.1.0"
+API_VERSION = "1.2.0"
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "processed" / "taco"
 
@@ -138,6 +139,22 @@ df_composition = _load_csv("taco_composicao.csv", COMPOSITION_COLUMNS)
 df_fatty_acids = _load_csv("taco_acidos_graxos.csv", FATTY_ACIDS_COLUMNS)
 df_amino_acids = _load_csv("taco_aminoacidos.csv", AMINO_ACIDS_COLUMNS)
 
+
+def _fold(texto: str) -> str:
+    """Minúsculas sem acentos, para busca insensível a acentuação."""
+    return unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode().lower()
+
+
+# Descrições normalizadas (mesmo índice de df_composition), calculadas uma vez
+# no import: "acucar" precisa encontrar "açúcar".
+_searchable_descriptions = (
+    df_composition["description"]
+    .str.normalize("NFKD")
+    .str.encode("ascii", "ignore")
+    .str.decode("ascii")
+    .str.lower()
+)
+
 # ---------------------------------------------------------------------------
 # Auxiliares
 # ---------------------------------------------------------------------------
@@ -163,6 +180,43 @@ def _get_food(food_id: int) -> dict:
 
 def _nutrient_cols(df: pd.DataFrame) -> list[str]:
     return [c for c in df.columns if c not in TEXT_FIELDS]
+
+
+def _find_row(df: pd.DataFrame, food_id: int) -> dict | None:
+    """Linha do alimento como dict, ou None se a tabela não o contém."""
+    matches = df[df["id"] == food_id]
+    return None if matches.empty else _row_to_dict(matches.iloc[0])
+
+
+# ---------------------------------------------------------------------------
+# Modelos de resposta (só documentam o OpenAPI; não filtram as respostas)
+# ---------------------------------------------------------------------------
+
+_TIPOS_TEXTO = {"id": (int, ...), "category": (str, ...), "description": (str, ...)}
+
+
+def _model_from_columns(name: str, columns: dict[str, str], *, texto: bool = True, **extra):
+    campos = {
+        campo: _TIPOS_TEXTO.get(campo, (float | None, None))
+        for campo in columns.values()
+        if texto or campo not in TEXT_FIELDS
+    }
+    return create_model(name, **campos, **extra)
+
+
+CompositionOut = _model_from_columns("CompositionOut", COMPOSITION_COLUMNS)
+FattyAcidsOut = _model_from_columns("FattyAcidsOut", FATTY_ACIDS_COLUMNS)
+AminoAcidsOut = _model_from_columns("AminoAcidsOut", AMINO_ACIDS_COLUMNS)
+
+_FoodFattyAcids = _model_from_columns("FoodFattyAcids", FATTY_ACIDS_COLUMNS, texto=False)
+_FoodAminoAcids = _model_from_columns("FoodAminoAcids", AMINO_ACIDS_COLUMNS, texto=False)
+
+FoodOut = create_model(
+    "FoodOut",
+    __base__=CompositionOut,
+    fatty_acids=(_FoodFattyAcids | None, None),
+    amino_acids=(_FoodAminoAcids | None, None),
+)
 
 
 # ---------------------------------------------------------------------------
@@ -263,7 +317,7 @@ def list_foods(
     filtered = df_composition
     if search:
         filtered = filtered[
-            filtered["description"].str.contains(search, case=False, na=False, regex=False)
+            _searchable_descriptions.str.contains(_fold(search), na=False, regex=False)
         ]
     total = len(filtered)
     page = filtered.iloc[skip : skip + limit][["id", "category", "description"]]
@@ -275,49 +329,40 @@ def list_foods(
     }
 
 
-@app.get("/foods/{food_id}", tags=["foods"])
+@app.get("/foods/{food_id}", tags=["foods"], responses={200: {"model": FoodOut}})
 def get_food(food_id: int):
     food = _get_food(food_id)
 
-    fa = df_fatty_acids[df_fatty_acids["id"] == food_id]
-    if not fa.empty:
-        fa_dict = _row_to_dict(fa.iloc[0])
-        for key in TEXT_FIELDS:
-            fa_dict.pop(key, None)
-        food["fatty_acids"] = fa_dict
-
-    aa = df_amino_acids[df_amino_acids["id"] == food_id]
-    if not aa.empty:
-        aa_dict = _row_to_dict(aa.iloc[0])
-        for key in TEXT_FIELDS:
-            aa_dict.pop(key, None)
-        food["amino_acids"] = aa_dict
+    for chave, df in (("fatty_acids", df_fatty_acids), ("amino_acids", df_amino_acids)):
+        row = _find_row(df, food_id)
+        if row is not None:
+            food[chave] = {k: v for k, v in row.items() if k not in TEXT_FIELDS}
 
     return food
 
 
-@app.get("/foods/{food_id}/fatty-acids", tags=["foods"])
+@app.get("/foods/{food_id}/fatty-acids", tags=["foods"], responses={200: {"model": FattyAcidsOut}})
 def get_food_fatty_acids(food_id: int):
     _get_food(food_id)  # 404 se o alimento não existe
-    fa = df_fatty_acids[df_fatty_acids["id"] == food_id]
-    if fa.empty:
+    row = _find_row(df_fatty_acids, food_id)
+    if row is None:
         raise HTTPException(status_code=404, detail=f"No fatty acid data for food id {food_id}")
-    return _row_to_dict(fa.iloc[0])
+    return row
 
 
-@app.get("/foods/{food_id}/amino-acids", tags=["foods"])
+@app.get("/foods/{food_id}/amino-acids", tags=["foods"], responses={200: {"model": AminoAcidsOut}})
 def get_food_amino_acids(food_id: int):
     _get_food(food_id)
-    aa = df_amino_acids[df_amino_acids["id"] == food_id]
-    if aa.empty:
+    row = _find_row(df_amino_acids, food_id)
+    if row is None:
         raise HTTPException(status_code=404, detail=f"No amino acid data for food id {food_id}")
-    return _row_to_dict(aa.iloc[0])
+    return row
 
 
 # -- Comparação e soma ---------------------------------------------------------
 
 
-@app.post("/foods/compare", tags=["tools"])
+@app.post("/foods/compare", tags=["tools"], responses={200: {"model": list[CompositionOut]}})
 def compare_foods(body: CompareRequest):
     return [_get_food(fid) for fid in body.ids]
 
@@ -328,9 +373,14 @@ def sum_nutrients(body: SumRequest):
 
     Os valores da TACO referem-se a 100 g de parte comestível; cada alimento
     contribui proporcionalmente a ``grams / 100``.
+
+    Nutriente sem dado na TACO não entra na soma. ``missing_values`` informa,
+    por nutriente, quantos itens não tinham valor — sem isso o total pareceria
+    exato quando na verdade é parcial.
     """
     nutrient_keys = _nutrient_cols(df_composition)
     totals: dict[str, float] = {k: 0.0 for k in nutrient_keys}
+    missing: dict[str, int] = {}
     foods_used: list[dict] = []
 
     for item in body.items:
@@ -341,8 +391,10 @@ def sum_nutrients(body: SumRequest):
         )
         for key in nutrient_keys:
             val = food.get(key)
-            if val is not None:
+            if val is None:
+                missing[key] = missing.get(key, 0) + 1
+            else:
                 totals[key] += val * factor
 
     totals = {k: round(v, DECIMAL_PLACES) for k, v in totals.items()}
-    return {"items": foods_used, "total_nutrients": totals}
+    return {"items": foods_used, "total_nutrients": totals, "missing_values": missing}

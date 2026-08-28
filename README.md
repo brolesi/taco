@@ -23,7 +23,6 @@ taco/
 ├── api/                  # API REST (FastAPI)
 ├── data/
 │   ├── raw/              # Fontes originais, imutáveis (TACO .xls, POF .xls)
-│   ├── interim/          # Exportações intermediárias legadas (CSV ; decimal vírgula)
 │   └── processed/taco/   # CSVs canônicos gerados pelo pipeline
 ├── docs/                 # Dicionário de dados
 ├── references/           # Documentos originais (PDFs) e guia de normalização
@@ -74,12 +73,12 @@ Os nomes de campo da API estão mapeados no
 | GET | `/health` | Verificação de saúde |
 | GET | `/categories` | Categorias e contagem de alimentos |
 | GET | `/categories/{nome}` | Alimentos de uma categoria |
-| GET | `/foods?search=&skip=&limit=` | Lista/busca paginada de alimentos |
+| GET | `/foods?search=&skip=&limit=` | Lista/busca paginada de alimentos (busca ignora acentos) |
 | GET | `/foods/{id}` | Composição completa de um alimento |
 | GET | `/foods/{id}/fatty-acids` | Perfil de ácidos graxos |
 | GET | `/foods/{id}/amino-acids` | Perfil de aminoácidos |
 | POST | `/foods/compare` | Compara a composição de 2+ alimentos |
-| POST | `/foods/sum` | Soma nutrientes ponderados por gramas |
+| POST | `/foods/sum` | Soma nutrientes ponderados por gramas (`missing_values` lista nutrientes sem dado) |
 
 Exemplo:
 
@@ -103,8 +102,8 @@ Detalhes de colunas, unidades e valores especiais (`Tr`, `NA`) no
 estão documentadas em
 [references/guia_normalizacao_taco.md](references/guia_normalizacao_taco.md).
 
-Os arquivos em `data/interim/taco/` são exportações intermediárias legadas
-(separador `;`, decimal com vírgula), mantidas apenas para referência histórica.
+As tabelas da POF em `data/raw/pof/` são fontes originais de referência: ainda
+não há pipeline que as processe.
 
 ## Desenvolvimento
 
