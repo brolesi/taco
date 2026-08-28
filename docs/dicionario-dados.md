@@ -178,7 +178,7 @@ Um valor ausente (NaN) significa "não analisado", e é diferente de `Tr`
 Gerado por [`scripts/process_pof.py`](../scripts/process_pof.py) a partir de
 `data/raw/pof/tabelamedidas_bd.xls` (Tabela de Medidas Referidas para os
 Alimentos Consumidos no Brasil, POF 2008-2009, IBGE). Informa **quanto pesa em
-gramas** cada medida caseira de um alimento: 1.120 alimentos e 103 tipos de
+gramas** cada medida caseira de um alimento: 1.119 alimentos e 103 tipos de
 medida ("colher de sopa", "concha", "fatia", "unidade").
 
 | Coluna | Unidade | Descrição | Campo na API |
@@ -199,8 +199,8 @@ medida ("colher de sopa", "concha", "fatia", "unidade").
 
 `codigo_alimento` (IBGE) e `numero_alimento` (TACO) são numerações
 independentes, e **este repositório não faz a ponte entre elas**. Medimos o
-quanto uma correspondência automática cobriria: apenas 148 dos 1.124 alimentos
-da POF (13%) têm nome-base idêntico a algum alimento da TACO, e desses só 83
+quanto uma correspondência automática cobriria: apenas 147 dos 1.119 alimentos
+da POF (13%) têm nome-base idêntico a algum alimento da TACO, e desses só 82
 são inequívocos — "arroz" na POF corresponde a 6 alimentos da TACO, "feijão" a
 15, que diferem em variedade e preparo e, portanto, em composição.
 

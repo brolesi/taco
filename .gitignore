@@ -17,8 +17,9 @@ env/
 .coverage
 htmlcov/
 
-# Artefato de release (gerado por scripts/build_sqlite.py)
+# Artefatos gerados (SQLite do release, site estático das Pages)
 *.sqlite
+dist/
 
 # Jupyter
 .ipynb_checkpoints/

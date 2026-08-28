@@ -3,6 +3,26 @@
 Este arquivo segue o formato [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.6.0] - não lançado
+
+### Adicionado
+
+- **API estática** publicada no GitHub Pages
+  (<https://brolesi.github.io/taco/>): um JSON por recurso, gerado por
+  `scripts/build_static_api.py` e publicado a cada push na `main`
+  (`.github/workflows/pages.yml`). As respostas saem das próprias funções de
+  `api.main`, então não existe uma segunda implementação do contrato para
+  divergir — há teste comparando as duas.
+- `.zenodo.json` com os metadados do dataset, para o DOI emitido a cada release
+  depois que o repositório for habilitado no Zenodo.
+
+### Corrigido
+
+- A contagem de alimentos da POF era 1.120 na documentação; são **1.119**
+  códigos distintos (1.124 pares código+descrição). Os números de
+  correspondência com a TACO passam a 147 alimentos com base idêntica e 82
+  inequívocos.
+
 ## [1.5.0] - 2026-08-28
 
 ### Adicionado
@@ -22,7 +42,7 @@ e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 - **Pipeline da POF/IBGE** (`scripts/process_pof.py`): normaliza a Tabela de
   Medidas Referidas em `data/processed/pof/pof_medidas_caseiras.csv` — 11.801
-  registros com o peso em gramas de 103 medidas caseiras para 1.120 alimentos.
+  registros com o peso em gramas de 103 medidas caseiras para 1.119 alimentos.
   A planilha em `data/raw/pof/` estava versionada desde a 1.0.0 sem nenhum
   pipeline que a consumisse.
 - Endpoints `GET /measures` (busca por alimento e filtro por medida, ambos sem

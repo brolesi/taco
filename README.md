@@ -44,6 +44,17 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
+### Consultar sem instalar nada
+
+Toda a TACO também é publicada como **JSON estático** em
+<https://brolesi.github.io/taco/> — mesmo conteúdo da API, servido por CDN, sem
+servidor, sem chave e sem limite de requisições:
+
+```bash
+curl https://brolesi.github.io/taco/foods/561.json
+curl https://brolesi.github.io/taco/coverage.json
+```
+
 ### Subir a API
 
 ```bash

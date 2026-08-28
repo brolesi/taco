@@ -1,0 +1,28 @@
+{
+  "title": "TACO - Tabela Brasileira de Composicao de Alimentos: dados normalizados e API REST",
+  "description": "Dados normalizados da Tabela Brasileira de Composicao de Alimentos (TACO, 4a edicao, NEPA/UNICAMP) e da Tabela de Medidas Referidas da POF 2008-2009 (IBGE), com pipelines reproduziveis, API REST em FastAPI e API estatica em JSON. Os CSVs sao regenerados byte a byte a partir das planilhas originais versionadas no repositorio.",
+  "upload_type": "dataset",
+  "license": "MIT",
+  "access_right": "open",
+  "creators": [
+    { "name": "Brolesi, Fabio Fogliarini" }
+  ],
+  "keywords": [
+    "food composition",
+    "composicao de alimentos",
+    "TACO",
+    "POF",
+    "nutrition",
+    "nutricao",
+    "Brazil",
+    "open data"
+  ],
+  "language": "por",
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/brolesi/taco",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ]
+}
