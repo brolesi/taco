@@ -28,6 +28,9 @@ e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [1.1.0] - 2026-07-09
 
+A API REST foi publicada nesta versão; os itens em "Alterado" que descrevem
+endpoints referem-se ao protótipo anterior, que não chegou a ser versionado.
+
 ### Corrigido
 
 - **Categorias dos alimentos nos CSVs `taco_*.csv`**: eram inferidas por faixas
@@ -41,9 +44,9 @@ e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
-- A API passou a ler os CSVs canônicos gerados pelo pipeline
-  (`taco_composicao.csv`, `taco_acidos_graxos.csv`, `taco_aminoacidos.csv`),
-  eliminando a dependência dos CSVs legados com cabeçalhos no estilo R.
+- A API lê os CSVs canônicos gerados pelo pipeline (`taco_composicao.csv`,
+  `taco_acidos_graxos.csv`, `taco_aminoacidos.csv`), eliminando a dependência
+  dos CSVs legados com cabeçalhos no estilo R.
 - Pipeline movido de `notebooks/01-process-taco.py` para
   `scripts/process_taco.py`, com caminhos resolvidos a partir da raiz do
   repositório (funciona de qualquer diretório), interface de linha de comando
@@ -57,6 +60,8 @@ e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **API REST em FastAPI** (`api/main.py`): consulta, comparação e soma de
+  nutrientes a partir dos CSVs canônicos.
 - Endpoint `GET /health`.
 - Testes automatizados da API (`tests/`) e CI no GitHub Actions (lint + testes).
 - `requirements.txt` / `requirements-dev.txt` na raiz, `pyproject.toml`
@@ -75,7 +80,12 @@ e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
   `taco_*.csv` gerados pelo pipeline.
 - `api/requirements.txt` (consolidado no `requirements.txt` da raiz).
 
-## [1.0.0] - 2026-02-13
+## [1.0.0] - 2026-01-17
 
-- Versão inicial: dados originais (TACO, POF, Guia Alimentar), pipeline de
-  processamento e API REST (FastAPI).
+- Versão inicial, apenas dados: fontes originais (TACO, POF, Guia Alimentar),
+  pipeline de processamento (`notebooks/01-process-taco.py`) e CSVs
+  normalizados em `data/processed/taco/`. A API REST só veio na 1.1.0.
+
+[1.2.0]: https://github.com/brolesi/taco/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/brolesi/taco/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/brolesi/taco/releases/tag/v1.0.0
