@@ -9,10 +9,11 @@ Dados normalizados e API REST da **Tabela Brasileira de Composição de Alimento
 
 O repositório oferece:
 
-- **Pipeline reproduzível** ([`scripts/process_taco.py`](scripts/process_taco.py)) que
-  converte a planilha original da TACO em CSVs limpos e normalizados;
-- **CSVs prontos para uso** em [`data/processed/taco/`](data/processed/taco/)
-  (composição centesimal, ácidos graxos e aminoácidos);
+- **Pipelines reproduzíveis** ([`scripts/process_taco.py`](scripts/process_taco.py) e
+  [`scripts/process_pof.py`](scripts/process_pof.py)) que convertem as planilhas
+  originais da TACO e da POF em CSVs limpos e normalizados;
+- **CSVs prontos para uso** em [`data/processed/`](data/processed/): composição
+  centesimal, ácidos graxos, aminoácidos e medidas caseiras em gramas;
 - **API REST** ([FastAPI](https://fastapi.tiangolo.com/)) para consulta, comparação
   e soma de nutrientes.
 
@@ -26,7 +27,7 @@ taco/
 │   └── processed/         # CSVs canônicos gerados pelos pipelines (taco/, pof/)
 ├── docs/                 # Dicionário de dados
 ├── references/           # Documentos originais (PDFs) e guia de normalização
-├── scripts/              # Pipeline de processamento
+├── scripts/              # Pipelines de processamento (TACO e POF)
 └── tests/                # Testes da API
 ```
 
@@ -54,11 +55,13 @@ No Windows, o atalho [`run.bat`](run.bat) faz o mesmo. A documentação interati
 
 ### Regenerar os CSVs processados
 
-Os CSVs já estão versionados; execute o pipeline apenas se quiser reproduzi-los
-a partir da planilha original:
+Os CSVs já estão versionados; execute os pipelines apenas se quiser reproduzi-los
+a partir das planilhas originais. A suíte de testes confere que a saída bate byte
+a byte com os arquivos commitados:
 
 ```bash
 python scripts/process_taco.py
+python scripts/process_pof.py
 ```
 
 ## API
