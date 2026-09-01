@@ -37,7 +37,7 @@ jobs:
         run: python -m scripts.build_static_api --saida-dir dist/site
 
       - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dist/site
 
