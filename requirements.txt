@@ -1,5 +1,5 @@
 # Dependências de runtime (API e pipeline de dados)
-fastapi>=0.140.13
+fastapi>=0.141.1
 uvicorn[standard]>=0.52.4
 # Teto de major em pandas/xlrd: são eles que definem os bytes dos CSVs, e o
 # teste de reprodutibilidade compara byte a byte. O teto não substitui o teste,
