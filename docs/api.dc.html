@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>TACO — API Estática | Tabela Brasileira de Composição de Alimentos</title>
+<meta name="description" content="API estática e aberta com dados da Tabela Brasileira de Composição de Alimentos (TACO): alimentos, nutrientes, categorias, preparações e medidas caseiras, servidos como JSON." />
+<meta property="og:title" content="TACO — API Estática" />
+<meta property="og:description" content="Dados da Tabela Brasileira de Composição de Alimentos disponíveis de forma simples, aberta e sem servidor." />
+<meta property="og:type" content="website" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%232f6d5e'/%3E%3Cpath d='M10 20c0-6 4-10 10-10-1 6-4 10-10 10z' fill='%23f2b545'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  body { margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  ::selection { background: oklch(88% 0.06 170); }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</helmet>
+
+<div style="font-family: 'Public Sans', sans-serif; background: oklch(98% 0.006 90); color: oklch(21% 0.012 90); min-height: 100vh; line-height: 1.55;">
+
+  <!-- HEADER -->
+  <header style="position: sticky; top: 0; z-index: 40; background: oklch(99.3% 0.003 90 / 0.92); backdrop-filter: blur(8px); border-bottom: 1px solid oklch(89% 0.006 90); display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; gap: 16px;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div style="width: 30px; height: 30px; border-radius: 8px; background: oklch(46% 0.09 170); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <div style="width: 12px; height: 12px; border-radius: 3px; background: oklch(72% 0.15 70);"></div>
+      </div>
+      <span style="font-weight: 800; font-size: 16px; letter-spacing: 0.2px;">TACO <span style="font-weight: 500; color: oklch(46% 0.01 90);">· API Estática</span></span>
+    </div>
+    <nav style="{{ desktopNavStyle }}">
+      <a href="#endpoints" style="color: oklch(21% 0.012 90); text-decoration: none;" style-hover="color: oklch(46% 0.09 170);">Documentação</a>
+      <a href="#explorer" style="color: oklch(21% 0.012 90); text-decoration: none;" style-hover="color: oklch(46% 0.09 170);">Explorar alimentos</a>
+      <a href="#categories" style="color: oklch(21% 0.012 90); text-decoration: none;" style-hover="color: oklch(46% 0.09 170);">Categorias</a>
+      <a href="#examples" style="color: oklch(21% 0.012 90); text-decoration: none;" style-hover="color: oklch(46% 0.09 170);">Exemplos</a>
+      <a href="https://github.com/brolesi/taco" target="_blank" rel="noopener" style="display: flex; align-items: center; gap: 6px; color: oklch(99% 0 0); text-decoration: none; background: oklch(21% 0.012 90); padding: 8px 14px; border-radius: 7px;" style-hover="background: oklch(37% 0.09 170);">GitHub</a>
+    </nav>
+    <button onClick="{{ toggleMobileMenu }}" aria-label="Abrir menu" style="{{ mobileToggleStyle }}">
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <div style="width: 16px; height: 2px; background: oklch(21% 0.012 90);"></div>
+        <div style="width: 16px; height: 2px; background: oklch(21% 0.012 90);"></div>
+        <div style="width: 16px; height: 2px; background: oklch(21% 0.012 90);"></div>
+      </div>
+    </button>
+  </header>
+
+  <sc-if value="{{ mobileMenuOpen }}" hint-placeholder-val="{{ false }}">
+    <nav style="position: sticky; top: 61px; z-index: 39; background: white; border-bottom: 1px solid oklch(89% 0.006 90); display: flex; flex-direction: column; padding: 8px 20px 16px; gap: 4px; animation: fadeIn 0.15s ease;">
+      <a href="#intro" onClick="{{ closeMobileMenu }}" style="padding: 10px 4px; color: oklch(21% 0.012 90); text-decoration: none; font-weight: 600; font-size: 14px; border-bottom: 1px solid oklch(93% 0.006 90);">Introdução</a>
+      <a href="#quickstart" onClick="{{ closeMobileMenu }}" style="padding: 10px 4px; color: oklch(21% 0.012 90); text-decoration: none; font-weight: 600; font-size: 14px; border-bottom: 1px solid oklch(93% 0.006 90);">Quick Start</a>
+      <a href="#endpoints" onClick="{{ closeMobileMenu }}" style="padding: 10px 4px; color: oklch(21% 0.012 90); text-decoration: none; font-weight: 600; font-size: 14px; border-bottom: 1px solid oklch(93% 0.006 90);">Endpoints</a>
+      <a href="#nutrients" onClick="{{ closeMobileMenu }}" style="padding: 10px 4px; color: oklch(21% 0.012 90); text-decoration: none; font-weight: 600; font-size: 14px; border-bottom: 1px solid oklch(93% 0.006 90);">Nutrientes</a>
+      <a href="#explorer" onClick="{{ closeMobileMenu }}" style="padding: 10px 4px; color: oklch(21% 0.012 90); text-decoration: none; font-weight: 600; font-size: 14px; border-bottom: 1px solid oklch(93% 0.006 90);">Explorar alimentos</a>
+      <a href="#categories" onClick="{{ closeMobileMenu }}" style="padding: 10px 4px; color: oklch(21% 0.012 90); text-decoration: none; font-weight: 600; font-size: 14px; border-bottom: 1px solid oklch(93% 0.006 90);">Categorias</a>
+      <a href="#preparations" onClick="{{ closeMobileMenu }}" style="padding: 10px 4px; color: oklch(21% 0.012 90); text-decoration: none; font-weight: 600; font-size: 14px; border-bottom: 1px solid oklch(93% 0.006 90);">Preparações</a>
+      <a href="#measures" onClick="{{ closeMobileMenu }}" style="padding: 10px 4px; color: oklch(21% 0.012 90); text-decoration: none; font-weight: 600; font-size: 14px; border-bottom: 1px solid oklch(93% 0.006 90);">Medidas caseiras</a>
+      <a href="#examples" onClick="{{ closeMobileMenu }}" style="padding: 10px 4px; color: oklch(21% 0.012 90); text-decoration: none; font-weight: 600; font-size: 14px; border-bottom: 1px solid oklch(93% 0.006 90);">Exemplos</a>
+      <a href="#playground" onClick="{{ closeMobileMenu }}" style="padding: 10px 4px; color: oklch(21% 0.012 90); text-decoration: none; font-weight: 600; font-size: 14px; border-bottom: 1px solid oklch(93% 0.006 90);">Playground</a>
+      <a href="#structure" onClick="{{ closeMobileMenu }}" style="padding: 10px 4px; color: oklch(21% 0.012 90); text-decoration: none; font-weight: 600; font-size: 14px; border-bottom: 1px solid oklch(93% 0.006 90);">Estrutura dos dados</a>
+      <a href="#sources" onClick="{{ closeMobileMenu }}" style="padding: 10px 4px; color: oklch(21% 0.012 90); text-decoration: none; font-weight: 600; font-size: 14px; border-bottom: 1px solid oklch(93% 0.006 90);">Fontes</a>
+      <a href="#license" onClick="{{ closeMobileMenu }}" style="padding: 10px 4px; color: oklch(21% 0.012 90); text-decoration: none; font-weight: 600; font-size: 14px;">Licença</a>
+      <a href="https://github.com/brolesi/taco" target="_blank" rel="noopener" style="margin-top: 8px; text-align: center; padding: 10px; background: oklch(21% 0.012 90); color: white; border-radius: 7px; text-decoration: none; font-weight: 700; font-size: 14px;">Ver no GitHub</a>
+    </nav>
+  </sc-if>
+
+  <!-- HERO -->
+  <section style="{{ heroGridStyle }}">
+    <div>
+      <div style="display: inline-flex; align-items: center; gap: 8px; background: oklch(93% 0.035 170); color: oklch(37% 0.09 170); padding: 6px 12px; border-radius: 100px; font-size: 12px; font-weight: 700; letter-spacing: 0.3px; text-transform: uppercase; margin-bottom: 20px;">
+        <span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(46% 0.09 170); display: inline-block;"></span>
+        Versão 1.7.0 · API ativa
+      </div>
+      <h1 style="font-size: 44px; line-height: 1.08; font-weight: 800; margin: 0 0 18px; letter-spacing: -0.5px;">TACO — API Estática</h1>
+      <p style="font-size: 18px; color: oklch(46% 0.01 90); margin: 0 0 28px; max-width: 46ch; text-wrap: pretty;">Dados da Tabela Brasileira de Composição de Alimentos disponíveis de forma simples, aberta e sem servidor.</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 32px;">
+        <sc-for list="{{ heroStats }}" as="stat" hint-placeholder-count="6">
+          <span style="font-size: 13px; font-weight: 600; background: white; border: 1px solid oklch(89% 0.006 90); padding: 7px 12px; border-radius: 7px; font-family: 'IBM Plex Mono', monospace;">{{ stat }}</span>
+        </sc-for>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+        <a href="#explorer" style="background: oklch(46% 0.09 170); color: white; padding: 13px 22px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 15px;" style-hover="background: oklch(37% 0.09 170);">Explorar alimentos</a>
+        <a href="#endpoints" style="background: white; border: 1px solid oklch(89% 0.006 90); color: oklch(21% 0.012 90); padding: 13px 22px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 15px;" style-hover="border-color: oklch(46% 0.09 170); color: oklch(46% 0.09 170);">Documentação</a>
+        <a href="https://github.com/brolesi/taco" target="_blank" rel="noopener" style="background: white; border: 1px solid oklch(89% 0.006 90); color: oklch(21% 0.012 90); padding: 13px 22px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 15px;" style-hover="border-color: oklch(21% 0.012 90);">GitHub ↗</a>
+      </div>
+    </div>
+    <div style="background: oklch(18% 0.012 90); border-radius: 14px; overflow: hidden; box-shadow: 0 20px 40px -20px oklch(20% 0.02 170 / 0.35);">
+      <div style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid oklch(30% 0.012 90);">
+        <span style="width: 10px; height: 10px; border-radius: 50%; background: oklch(65% 0.12 25);"></span>
+        <span style="width: 10px; height: 10px; border-radius: 50%; background: oklch(75% 0.13 80);"></span>
+        <span style="width: 10px; height: 10px; border-radius: 50%; background: oklch(65% 0.12 150);"></span>
+        <span style="margin-left: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: oklch(70% 0.01 90);">GET /foods.json</span>
+      </div>
+      <pre style="margin: 0; padding: 18px 16px; color: oklch(92% 0.01 90); font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; overflow-x: auto; line-height: 1.7;"><code>{
+  "total": 597,
+  "foods": [
+    { "id": 1, "category": "Cereais e derivados", "description": "Arroz, integral, cozido" },
+    { "id": 2, "category": "Cereais e derivados", "description": "Arroz, integral, cru" },
+    <span style="color: oklch(70% 0.01 90);">// + 595 alimentos</span>
+  ]
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- LAYOUT: SIDEBAR + CONTENT -->
+  <div style="{{ layoutGridStyle }}">
+
+    <aside style="{{ sidebarStyle }}">
+      <nav aria-label="Navegação da documentação">
+        <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="12">
+          <a href="{{ item.href }}" style="{{ item.style }}">{{ item.label }}</a>
+        </sc-for>
+      </nav>
+    </aside>
+
+    <main style="min-width: 0;">
+
+      <!-- INTRODUÇÃO -->
+      <section id="intro" style="padding: 40px 0; border-bottom: 1px solid oklch(89% 0.006 90); scroll-margin-top: 80px;">
+        <h2 style="font-size: 26px; font-weight: 800; margin: 0 0 16px;">Introdução</h2>
+        <h3 style="font-size: 16px; font-weight: 700; margin: 24px 0 8px; color: oklch(37% 0.09 170);">Sobre a TACO</h3>
+        <p style="font-size: 15px; color: oklch(30% 0.01 90); max-width: 70ch; text-wrap: pretty;">A Tabela Brasileira de Composição de Alimentos (TACO), 4ª edição, é publicada pelo Núcleo de Estudos e Pesquisas em Alimentação (NEPA) da UNICAMP e reúne dados de composição nutricional de alimentos consumidos no Brasil.</p>
+        <h3 style="font-size: 16px; font-weight: 700; margin: 24px 0 8px; color: oklch(37% 0.09 170);">Sobre esta API</h3>
+        <p style="font-size: 15px; color: oklch(30% 0.01 90); max-width: 70ch; text-wrap: pretty;">Esta é uma API inteiramente estática: cada endpoint é um arquivo JSON pré-gerado e hospedado no GitHub Pages. Não há servidor de aplicação, chave de API, autenticação ou limite de requisições — basta fazer requisições HTTP GET diretamente aos arquivos.</p>
+        <div style="margin-top: 20px; background: oklch(93% 0.05 75); border: 1px solid oklch(80% 0.08 70); border-radius: 10px; padding: 16px 18px; max-width: 70ch;">
+          <p style="margin: 0; font-size: 14px; color: oklch(30% 0.06 60); font-weight: 600;">TACO × POF: os identificadores não são equivalentes</p>
+          <p style="margin: 6px 0 0; font-size: 13.5px; color: oklch(32% 0.04 60);">Os códigos da POF (usados nas medidas caseiras) são do IBGE e <strong>não</strong> correspondem aos ids dos alimentos da TACO. Não há equivalência automática entre as duas tabelas — veja a seção <a href="#measures" style="color: oklch(37% 0.09 170);">Medidas caseiras</a>.</p>
+        </div>
+      </section>
+
+      <!-- QUICK START -->
+      <section id="quickstart" style="padding: 40px 0; border-bottom: 1px solid oklch(89% 0.006 90); scroll-margin-top: 80px;">
+        <h2 style="font-size: 26px; font-weight: 800; margin: 0 0 8px;">Comece em 30 segundos</h2>
+        <p style="font-size: 15px; color: oklch(46% 0.01 90); margin: 0 0 20px;">Sem instalação, sem chave. Faça uma requisição GET a qualquer endpoint.</p>
+        <div style="display: flex; gap: 4px; margin-bottom: 0; border-bottom: 1px solid oklch(89% 0.006 90);">
+          <sc-for list="{{ qsTabs }}" as="tab" hint-placeholder-count="3">
+            <button onClick="{{ tab.onClick }}" style="{{ tab.style }}">{{ tab.label }}</button>
+          </sc-for>
+        </div>
+        <div style="position: relative; background: oklch(18% 0.012 90); border-radius: 0 0 10px 10px; overflow: hidden;">
+          <button onClick="{{ copyQuickstart }}" style="position: absolute; top: 10px; right: 10px; background: oklch(30% 0.012 90); color: oklch(90% 0.01 90); border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">{{ qsCopyLabel }}</button>
+          <pre style="margin: 0; padding: 20px 18px; color: oklch(92% 0.01 90); font-family: 'IBM Plex Mono', monospace; font-size: 13px; overflow-x: auto; line-height: 1.7;"><code>{{ qsCode }}</code></pre>
+        </div>
+      </section>
+
+      <!-- ENDPOINTS -->
+      <section id="endpoints" style="padding: 40px 0; border-bottom: 1px solid oklch(89% 0.006 90); scroll-margin-top: 80px;">
+        <h2 style="font-size: 26px; font-weight: 800; margin: 0 0 8px;">Endpoints</h2>
+        <p style="font-size: 15px; color: oklch(46% 0.01 90); margin: 0 0 24px;">Todos os endpoints são arquivos estáticos servidos via HTTPS a partir de <code style="font-family: 'IBM Plex Mono', monospace; background: oklch(97% 0.008 90); padding: 2px 6px; border-radius: 4px;">https://brolesi.github.io/taco/</code>.</p>
+
+        <sc-for list="{{ endpoints }}" as="ep" hint-placeholder-count="9">
+          <div id="{{ ep.id }}" style="margin-bottom: 24px; border: 1px solid oklch(89% 0.006 90); border-radius: 10px; overflow: hidden; scroll-margin-top: 80px;">
+            <div style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: white; border-bottom: 1px solid oklch(93% 0.006 90); flex-wrap: wrap;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 700; color: oklch(46% 0.09 170); background: oklch(93% 0.035 170); padding: 4px 8px; border-radius: 5px;">GET</span>
+              <a href="{{ ep.url }}" target="_blank" rel="noopener" style="font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; color: oklch(21% 0.012 90); text-decoration: none;" style-hover="color: oklch(46% 0.09 170);">{{ ep.path }}</a>
+            </div>
+            <div style="padding: 16px 18px; background: oklch(99.3% 0.003 90);">
+              <p style="margin: 0 0 10px; font-size: 14px; color: oklch(30% 0.01 90);">{{ ep.description }}</p>
+              <sc-if value="{{ ep.hasParams }}" hint-placeholder-val="{{ false }}">
+                <p style="margin: 0 0 10px; font-size: 13px; color: oklch(46% 0.01 90);"><strong>Parâmetro:</strong> {{ ep.paramsText }}</p>
+              </sc-if>
+              <sc-if value="{{ ep.hasNote }}" hint-placeholder-val="{{ false }}">
+                <p style="margin: 0 0 10px; font-size: 13px; color: oklch(46% 0.01 90);"><strong>Observação:</strong> {{ ep.note }}</p>
+              </sc-if>
+              <p style="margin: 12px 0 4px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: oklch(46% 0.01 90);">Resposta</p>
+              <pre style="margin: 0; padding: 14px 16px; background: oklch(18% 0.012 90); color: oklch(92% 0.01 90); border-radius: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; overflow-x: auto; line-height: 1.6; max-height: 340px;"><code>{{ ep.response }}</code></pre>
+            </div>
+          </div>
+        </sc-for>
+      </section>
+
+      <!-- NUTRIENTES / COVERAGE -->
+      <section id="nutrients" style="padding: 40px 0; border-bottom: 1px solid oklch(89% 0.006 90); scroll-margin-top: 80px;">
+        <h2 style="font-size: 26px; font-weight: 800; margin: 0 0 8px;">Nutrientes e cobertura de dados</h2>
+        <p style="font-size: 15px; color: oklch(46% 0.01 90); margin: 0 0 20px; max-width: 70ch;">Nem todos os 597 alimentos têm valor registrado para todos os nutrientes. Os percentuais abaixo vêm de <code style="font-family: 'IBM Plex Mono', monospace; background: oklch(97% 0.008 90); padding: 2px 6px; border-radius: 4px;">coverage.json</code> e mostram para quantos alimentos cada campo tem dado disponível.</p>
+
+        <sc-if value="{{ coverageLoading }}" hint-placeholder-val="{{ false }}">
+          <p style="font-size: 14px; color: oklch(46% 0.01 90);">Carregando cobertura…</p>
+        </sc-if>
+        <sc-if value="{{ coverageError }}" hint-placeholder-val="{{ false }}">
+          <p style="font-size: 14px; color: oklch(55% 0.15 25);">{{ coverageError }}</p>
+        </sc-if>
+
+        <sc-if value="{{ hasCoverage }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <sc-for list="{{ coverageRows }}" as="row" hint-placeholder-count="10">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                  <span style="font-weight: 600;">{{ row.label }}</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; color: oklch(46% 0.01 90);">{{ row.text }}</span>
+                </div>
+                <div style="height: 8px; background: oklch(93% 0.006 90); border-radius: 100px; overflow: hidden;">
+                  <div style="height: 100%; background: oklch(46% 0.09 170); border-radius: 100px; width: {{ row.width }};"></div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 24px;">
+            <sc-for list="{{ coverageTables }}" as="t" hint-placeholder-count="2">
+              <div style="border: 1px solid oklch(89% 0.006 90); border-radius: 10px; padding: 14px 16px; background: white;">
+                <p style="margin: 0 0 4px; font-size: 13px; font-weight: 700;">{{ t.name }}</p>
+                <p style="margin: 0; font-size: 13px; color: oklch(46% 0.01 90);">{{ t.text }}</p>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </section>
+
+      <!-- EXPLORADOR DE ALIMENTOS -->
+      <section id="explorer" style="padding: 40px 0; border-bottom: 1px solid oklch(89% 0.006 90); scroll-margin-top: 80px;">
+        <h2 style="font-size: 26px; font-weight: 800; margin: 0 0 8px;">Explorar alimentos</h2>
+        <p style="font-size: 15px; color: oklch(46% 0.01 90); margin: 0 0 20px;">Dados carregados ao vivo de <code style="font-family: 'IBM Plex Mono', monospace; background: oklch(97% 0.008 90); padding: 2px 6px; border-radius: 4px;">foods.json</code>. Clique em um alimento para ver a composição completa.</p>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
+          <input type="text" value="{{ search }}" onChange="{{ onSearchChange }}" placeholder="Buscar por nome…" aria-label="Buscar alimento" style="flex: 1; min-width: 200px; padding: 10px 14px; border: 1px solid oklch(89% 0.006 90); border-radius: 8px; font-size: 14px; font-family: inherit;" />
+          <select value="{{ categoryFilter }}" onChange="{{ onCategoryChange }}" aria-label="Filtrar por categoria" style="padding: 10px 14px; border: 1px solid oklch(89% 0.006 90); border-radius: 8px; font-size: 14px; font-family: inherit; background: white;">
+            <option value="">Todas as categorias</option>
+            <sc-for list="{{ categoryOptions }}" as="cat" hint-placeholder-count="15">
+              <option value="{{ cat }}">{{ cat }}</option>
+            </sc-for>
+          </select>
+          <select value="{{ sortKey }}" onChange="{{ onSortChange }}" aria-label="Ordenar por" style="padding: 10px 14px; border: 1px solid oklch(89% 0.006 90); border-radius: 8px; font-size: 14px; font-family: inherit; background: white;">
+            <option value="description">Nome (A–Z)</option>
+            <option value="id_asc">ID (crescente)</option>
+            <option value="id_desc">ID (decrescente)</option>
+          </select>
+        </div>
+
+        <sc-if value="{{ foodsLoading }}" hint-placeholder-val="{{ true }}">
+          <p style="font-size: 14px; color: oklch(46% 0.01 90);">Carregando alimentos…</p>
+        </sc-if>
+        <sc-if value="{{ foodsError }}" hint-placeholder-val="{{ false }}">
+          <p style="font-size: 14px; color: oklch(55% 0.15 25);">{{ foodsError }}</p>
+        </sc-if>
+
+        <sc-if value="{{ hasFoods }}" hint-placeholder-val="{{ false }}">
+          <p style="font-size: 13px; color: oklch(46% 0.01 90); margin: 0 0 12px;">{{ resultCountText }}</p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px;">
+            <sc-for list="{{ pagedFoods }}" as="food" hint-placeholder-count="9">
+              <button onClick="{{ food.onClick }}" style="text-align: left; border: 1px solid oklch(89% 0.006 90); background: white; border-radius: 10px; padding: 14px 16px; cursor: pointer; font-family: inherit;" style-hover="border-color: oklch(46% 0.09 170); box-shadow: 0 2px 8px oklch(20% 0.02 170 / 0.08);">
+                <p style="margin: 0 0 6px; font-size: 14px; font-weight: 700; line-height: 1.3;">{{ food.description }}</p>
+                <p style="margin: 0 0 8px; font-size: 12px; color: oklch(46% 0.01 90);">{{ food.category }}</p>
+                <span style="font-size: 11px; font-weight: 700; background: oklch(93% 0.035 170); color: oklch(37% 0.09 170); padding: 3px 8px; border-radius: 5px; font-family: 'IBM Plex Mono', monospace;">{{ food.idText }}</span>
+              </button>
+            </sc-for>
+          </div>
+          <sc-if value="{{ hasMore }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; justify-content: center; margin-top: 24px;">
+              <button onClick="{{ loadMore }}" style="background: white; border: 1px solid oklch(89% 0.006 90); padding: 10px 24px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer;" style-hover="border-color: oklch(46% 0.09 170); color: oklch(46% 0.09 170);">Carregar mais</button>
+            </div>
+          </sc-if>
+        </sc-if>
+        <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+          <p style="font-size: 14px; color: oklch(46% 0.01 90); padding: 24px 0;">Nenhum alimento encontrado para essa busca.</p>
+        </sc-if>
+      </section>
+
+      <!-- MODAL DE DETALHE -->
+      <sc-if value="{{ detailFood }}" hint-placeholder-val="{{ false }}">
+        <div style="position: fixed; inset: 0; background: oklch(15% 0.01 90 / 0.5); z-index: 60; display: flex; align-items: center; justify-content: center; padding: 20px;" onClick="{{ closeDetail }}">
+          <div style="background: white; border-radius: 14px; max-width: 640px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 28px;" onClick="{{ stopPropagation }}">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 4px;">
+              <h3 style="margin: 0; font-size: 20px; font-weight: 800;">{{ detailFood.description }}</h3>
+              <button onClick="{{ closeDetail }}" aria-label="Fechar" style="background: oklch(97% 0.008 90); border: none; width: 30px; height: 30px; border-radius: 8px; font-size: 16px; cursor: pointer; flex-shrink: 0;">✕</button>
+            </div>
+            <p style="margin: 0 0 20px; font-size: 13px; color: oklch(46% 0.01 90); font-family: 'IBM Plex Mono', monospace;">foods/{{ detailFood.id }}.json</p>
+
+            <sc-for list="{{ detailGroups }}" as="group" hint-placeholder-count="3">
+              <div style="margin-bottom: 20px;">
+                <p style="margin: 0 0 10px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: oklch(37% 0.09 170);">{{ group.title }}</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; font-size: 13.5px;">
+                  <sc-for list="{{ group.rows }}" as="row" hint-placeholder-count="6">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid oklch(95% 0.006 90); padding-bottom: 6px;">
+                      <span style="color: oklch(46% 0.01 90);">{{ row.label }}</span>
+                      <span style="font-weight: 600; font-family: 'IBM Plex Mono', monospace;">{{ row.value }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+
+            <div style="margin-bottom: 8px;">
+              <p style="margin: 0 0 10px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: oklch(37% 0.09 170);">Variações</p>
+              <sc-if value="{{ detailVariantsLoading }}" hint-placeholder-val="{{ false }}">
+                <p style="font-size: 13px; color: oklch(46% 0.01 90);">Carregando…</p>
+              </sc-if>
+              <sc-if value="{{ hasVariants }}" hint-placeholder-val="{{ false }}">
+                <ul style="margin: 0; padding-left: 18px; font-size: 13.5px;">
+                  <sc-for list="{{ detailVariants }}" as="v" hint-placeholder-count="2">
+                    <li>{{ v }}</li>
+                  </sc-for>
+                </ul>
+              </sc-if>
+              <sc-if value="{{ noVariants }}" hint-placeholder-val="{{ false }}">
+                <p style="font-size: 13px; color: oklch(46% 0.01 90);">Nenhuma variante registrada para este alimento.</p>
+              </sc-if>
+            </div>
+
+            <div style="background: oklch(97% 0.008 90); border-radius: 8px; padding: 12px 14px; font-size: 12.5px; color: oklch(46% 0.01 90);">
+              As medidas caseiras usam identificadores da POF (IBGE), não o id acima. Consulte a seção <a href="#measures" onClick="{{ closeDetail }}" style="color: oklch(37% 0.09 170);">Medidas caseiras</a>.
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- CATEGORIAS -->
+      <section id="categories" style="padding: 40px 0; border-bottom: 1px solid oklch(89% 0.006 90); scroll-margin-top: 80px;">
+        <h2 style="font-size: 26px; font-weight: 800; margin: 0 0 8px;">Categorias</h2>
+        <p style="font-size: 15px; color: oklch(46% 0.01 90); margin: 0 0 20px;">{{ categoriesTotalText }}</p>
+        <sc-if value="{{ categoriesLoading }}" hint-placeholder-val="{{ false }}">
+          <p style="font-size: 14px; color: oklch(46% 0.01 90);">Carregando categorias…</p>
+        </sc-if>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
+          <sc-for list="{{ categoriesList }}" as="cat" hint-placeholder-count="15">
+            <button onClick="{{ cat.onClick }}" style="text-align: left; display: flex; justify-content: space-between; align-items: center; border: 1px solid oklch(89% 0.006 90); background: white; border-radius: 10px; padding: 14px 16px; cursor: pointer; font-family: inherit;" style-hover="border-color: oklch(46% 0.09 170);">
+              <span style="font-size: 14px; font-weight: 600;">{{ cat.category }}</span>
+              <span style="font-size: 12px; font-weight: 700; background: oklch(93% 0.035 170); color: oklch(37% 0.09 170); padding: 3px 9px; border-radius: 100px; font-family: 'IBM Plex Mono', monospace;">{{ cat.count }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <p style="margin-top: 16px; font-size: 12.5px; color: oklch(46% 0.01 90);">O padrão <code style="font-family: 'IBM Plex Mono', monospace; background: oklch(97% 0.008 90); padding: 2px 6px; border-radius: 4px;">categories/{slug}.json</code> retorna o detalhe de uma categoria específica — veja a lista completa acima ou em <a href="https://brolesi.github.io/taco/categories.json" target="_blank" rel="noopener" style="color: oklch(37% 0.09 170);">categories.json</a>.</p>
+      </section>
+
+      <!-- PREPARAÇÕES -->
+      <section id="preparations" style="padding: 40px 0; border-bottom: 1px solid oklch(89% 0.006 90); scroll-margin-top: 80px;">
+        <h2 style="font-size: 26px; font-weight: 800; margin: 0 0 8px;">Preparações</h2>
+        <p style="font-size: 15px; color: oklch(46% 0.01 90); margin: 0 0 8px; max-width: 70ch;">Muitos alimentos da TACO descrevem a mesma matéria-prima em diferentes formas de preparo (cru, cozido, grelhado, frito). Cada alimento traz os campos <code style="font-family: 'IBM Plex Mono', monospace; background: oklch(97% 0.008 90); padding: 2px 6px; border-radius: 4px;">base_name</code>, <code style="font-family: 'IBM Plex Mono', monospace; background: oklch(97% 0.008 90); padding: 2px 6px; border-radius: 4px;">preparation</code> e <code style="font-family: 'IBM Plex Mono', monospace; background: oklch(97% 0.008 90); padding: 2px 6px; border-radius: 4px;">qualifiers</code> — por exemplo, "Arroz" / "cozido" / "integral". O endpoint <code style="font-family: 'IBM Plex Mono', monospace; background: oklch(97% 0.008 90); padding: 2px 6px; border-radius: 4px;">preparations.json</code> lista as preparações reconhecidas pela base.</p>
+        <button onClick="{{ loadPreparations }}" style="margin: 8px 0 12px; background: white; border: 1px solid oklch(89% 0.006 90); padding: 9px 18px; border-radius: 8px; font-weight: 700; font-size: 13.5px; cursor: pointer;" style-hover="border-color: oklch(46% 0.09 170); color: oklch(46% 0.09 170);">{{ preparationsButtonLabel }}</button>
+        <sc-if value="{{ preparationsData }}" hint-placeholder-val="{{ false }}">
+          <pre style="margin: 0; padding: 16px; background: oklch(18% 0.012 90); color: oklch(92% 0.01 90); border-radius: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; overflow-x: auto; max-height: 320px; line-height: 1.6;"><code>{{ preparationsData }}</code></pre>
+        </sc-if>
+      </section>
+
+      <!-- MEDIDAS CASEIRAS -->
+      <section id="measures" style="padding: 40px 0; border-bottom: 1px solid oklch(89% 0.006 90); scroll-margin-top: 80px;">
+        <h2 style="font-size: 26px; font-weight: 800; margin: 0 0 8px;">Medidas caseiras</h2>
+        <p style="font-size: 15px; color: oklch(46% 0.01 90); margin: 0 0 12px; max-width: 70ch;">As medidas caseiras (ex.: "1 colher de sopa = 12 g") vêm da Pesquisa de Orçamentos Familiares (POF) 2008–2009 do IBGE, e são indexadas por <strong>pof_food_id</strong> — um identificador do IBGE, não da TACO.</p>
+        <div style="background: oklch(93% 0.05 75); border: 1px solid oklch(80% 0.08 70); border-radius: 10px; padding: 14px 16px; max-width: 70ch; margin-bottom: 20px;">
+          <p style="margin: 0; font-size: 13.5px; color: oklch(32% 0.04 60); font-weight: 600;">Os códigos da POF são do IBGE e não correspondem aos IDs da TACO; não há equivalência automática entre as duas tabelas.</p>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 24px;">
+          <div style="flex: 1; min-width: 260px;">
+            <p style="margin: 0 0 8px; font-size: 13px; font-weight: 700;">measures/index.json</p>
+            <button onClick="{{ loadMeasuresIndex }}" style="margin-bottom: 10px; background: white; border: 1px solid oklch(89% 0.006 90); padding: 9px 18px; border-radius: 8px; font-weight: 700; font-size: 13.5px; cursor: pointer;" style-hover="border-color: oklch(46% 0.09 170); color: oklch(46% 0.09 170);">{{ measuresIndexButtonLabel }}</button>
+            <sc-if value="{{ measuresIndexData }}" hint-placeholder-val="{{ false }}">
+              <pre style="margin: 0; padding: 14px; background: oklch(18% 0.012 90); color: oklch(92% 0.01 90); border-radius: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; overflow-x: auto; max-height: 260px; line-height: 1.6;"><code>{{ measuresIndexData }}</code></pre>
+            </sc-if>
+          </div>
+          <div style="flex: 1; min-width: 260px;">
+            <p style="margin: 0 0 8px; font-size: 13px; font-weight: 700;">measures/{pof_food_id}.json</p>
+            <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+              <input type="text" value="{{ measuresIdInput }}" onChange="{{ onMeasuresIdChange }}" placeholder="pof_food_id" aria-label="pof_food_id" style="flex: 1; padding: 9px 12px; border: 1px solid oklch(89% 0.006 90); border-radius: 8px; font-size: 13.5px; font-family: 'IBM Plex Mono', monospace;" />
+              <button onClick="{{ loadMeasuresDetail }}" style="background: oklch(46% 0.09 170); color: white; border: none; padding: 9px 16px; border-radius: 8px; font-weight: 700; font-size: 13.5px; cursor: pointer;">Buscar</button>
+            </div>
+            <sc-if value="{{ measuresDetailError }}" hint-placeholder-val="{{ false }}">
+              <p style="font-size: 13px; color: oklch(55% 0.15 25);">{{ measuresDetailError }}</p>
+            </sc-if>
+            <sc-if value="{{ measuresDetailData }}" hint-placeholder-val="{{ false }}">
+              <pre style="margin: 0; padding: 14px; background: oklch(18% 0.012 90); color: oklch(92% 0.01 90); border-radius: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; overflow-x: auto; max-height: 260px; line-height: 1.6;"><code>{{ measuresDetailData }}</code></pre>
+            </sc-if>
+          </div>
+        </div>
+      </section>
+
+      <!-- EXEMPLOS -->
+      <section id="examples" style="padding: 40px 0; border-bottom: 1px solid oklch(89% 0.006 90); scroll-margin-top: 80px;">
+        <h2 style="font-size: 26px; font-weight: 800; margin: 0 0 20px;">Exemplos práticos</h2>
+        <sc-for list="{{ examples }}" as="ex" hint-placeholder-count="8">
+          <div style="margin-bottom: 20px; border: 1px solid oklch(89% 0.006 90); border-radius: 10px; overflow: hidden;">
+            <div style="padding: 14px 18px; background: white; border-bottom: 1px solid oklch(93% 0.006 90);">
+              <p style="margin: 0 0 4px; font-size: 15px; font-weight: 700;">{{ ex.title }}</p>
+              <p style="margin: 0; font-size: 13.5px; color: oklch(46% 0.01 90);">{{ ex.description }}</p>
+            </div>
+            <div style="position: relative; background: oklch(18% 0.012 90);">
+              <button onClick="{{ ex.onCopy }}" style="position: absolute; top: 10px; right: 10px; background: oklch(30% 0.012 90); color: oklch(90% 0.01 90); border: none; padding: 5px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer;">{{ ex.copyLabel }}</button>
+              <pre style="margin: 0; padding: 16px 18px; color: oklch(92% 0.01 90); font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; overflow-x: auto; line-height: 1.65;"><code>{{ ex.code }}</code></pre>
+            </div>
+            <sc-if value="{{ ex.hasResult }}" hint-placeholder-val="{{ false }}">
+              <p style="margin: 0; padding: 10px 18px; font-size: 12.5px; color: oklch(46% 0.01 90); background: oklch(99.3% 0.003 90);"><strong>Resultado esperado:</strong> {{ ex.result }}</p>
+            </sc-if>
+          </div>
+        </sc-for>
+      </section>
+
+      <!-- PLAYGROUND -->
+      <section id="playground" style="padding: 40px 0; border-bottom: 1px solid oklch(89% 0.006 90); scroll-margin-top: 80px;">
+        <h2 style="font-size: 26px; font-weight: 800; margin: 0 0 8px;">API Playground</h2>
+        <p style="font-size: 15px; color: oklch(46% 0.01 90); margin: 0 0 20px;">Escolha um endpoint e execute uma requisição real diretamente no navegador.</p>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-bottom: 6px;">
+          <div style="flex: 1; min-width: 240px;">
+            <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: oklch(46% 0.01 90);">Endpoint</label>
+            <select value="{{ pgEndpoint }}" onChange="{{ onPgEndpointChange }}" style="width: 100%; padding: 10px 14px; border: 1px solid oklch(89% 0.006 90); border-radius: 8px; font-size: 14px; font-family: inherit; background: white;">
+              <sc-for list="{{ pgOptions }}" as="opt" hint-placeholder-count="10">
+                <option value="{{ opt.key }}">{{ opt.label }}</option>
+              </sc-for>
+            </select>
+          </div>
+          <sc-if value="{{ pgNeedsParam }}" hint-placeholder-val="{{ false }}">
+            <div style="min-width: 160px;">
+              <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: oklch(46% 0.01 90);">{{ pgParamLabel }}</label>
+              <input type="text" value="{{ pgParam }}" onChange="{{ onPgParamChange }}" style="width: 100%; padding: 10px 14px; border: 1px solid oklch(89% 0.006 90); border-radius: 8px; font-size: 14px; font-family: 'IBM Plex Mono', monospace;" />
+            </div>
+          </sc-if>
+          <button onClick="{{ runPlayground }}" style="background: oklch(46% 0.09 170); color: white; border: none; padding: 11px 22px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer;">{{ pgButtonLabel }}</button>
+        </div>
+        <p style="margin: 0 0 16px; font-size: 12.5px; color: oklch(46% 0.01 90); font-family: 'IBM Plex Mono', monospace;">{{ pgUrl }}</p>
+
+        <sc-if value="{{ pgError }}" hint-placeholder-val="{{ false }}">
+          <p style="font-size: 14px; color: oklch(55% 0.15 25); margin-bottom: 12px;">{{ pgError }}</p>
+        </sc-if>
+        <sc-if value="{{ pgResult }}" hint-placeholder-val="{{ false }}">
+          <div style="position: relative; background: oklch(18% 0.012 90); border-radius: 10px; overflow: hidden;">
+            <div style="display: flex; gap: 8px; position: absolute; top: 10px; right: 10px;">
+              <button onClick="{{ openPgEndpoint }}" style="background: oklch(30% 0.012 90); color: oklch(90% 0.01 90); border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">Abrir endpoint ↗</button>
+              <button onClick="{{ copyPgResult }}" style="background: oklch(30% 0.012 90); color: oklch(90% 0.01 90); border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">{{ pgCopyLabel }}</button>
+            </div>
+            <pre style="margin: 0; padding: 20px 18px; color: oklch(92% 0.01 90); font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; overflow-x: auto; max-height: 420px; line-height: 1.6;"><code>{{ pgResult }}</code></pre>
+          </div>
+        </sc-if>
+      </section>
+
+      <!-- ESTRUTURA DOS DADOS -->
+      <section id="structure" style="padding: 40px 0; border-bottom: 1px solid oklch(89% 0.006 90); scroll-margin-top: 80px;">
+        <h2 style="font-size: 26px; font-weight: 800; margin: 0 0 16px;">Estrutura dos dados</h2>
+        <pre style="margin: 0; padding: 20px; background: oklch(18% 0.012 90); color: oklch(92% 0.01 90); border-radius: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; overflow-x: auto; line-height: 1.7;"><code>TACO API
+│
+├── index.json                       metadados e lista de endpoints
+├── coverage.json                    cobertura de dados por nutriente
+├── foods.json                       os 597 alimentos
+│
+├── foods/
+│   └── {id}.json                    composição completa do alimento
+│       └── variants.json            outras formas de preparo (foods/{id}/variants.json)
+│
+├── categories.json                  lista de categorias
+│   └── categories/{slug}.json       detalhe de uma categoria
+│
+├── preparations.json                preparações reconhecidas
+│
+└── measures/
+    ├── index.json                   índice de medidas caseiras (POF)
+    └── {pof_food_id}.json           medidas caseiras de um item POF</code></pre>
+      </section>
+
+      <!-- FONTES -->
+      <section id="sources" style="padding: 40px 0; border-bottom: 1px solid oklch(89% 0.006 90); scroll-margin-top: 80px;">
+        <h2 style="font-size: 26px; font-weight: 800; margin: 0 0 16px;">Fontes e metodologia</h2>
+        <ul style="margin: 0; padding-left: 20px; font-size: 14.5px; color: oklch(30% 0.01 90); display: flex; flex-direction: column; gap: 10px; max-width: 70ch;">
+          <li><strong>Tabela Brasileira de Composição de Alimentos (TACO)</strong>, 4ª edição — NEPA/UNICAMP.</li>
+          <li><strong>Medidas caseiras</strong> derivadas da Pesquisa de Orçamentos Familiares (POF) 2008–2009 — IBGE.</li>
+          <li>Todos os endpoints são <strong>arquivos JSON estáticos</strong>, gerados a partir dessas fontes e publicados via GitHub Pages — não há atualização em tempo real.</li>
+          <li>Código-fonte e a versão dinâmica em FastAPI: <a href="https://github.com/brolesi/taco" target="_blank" rel="noopener" style="color: oklch(37% 0.09 170);">github.com/brolesi/taco</a>.</li>
+        </ul>
+      </section>
+
+      <!-- LICENÇA -->
+      <section id="license" style="padding: 40px 0; scroll-margin-top: 24px;">
+        <h2 style="font-size: 26px; font-weight: 800; margin: 0 0 16px;">Licença</h2>
+        <div style="border: 1px solid oklch(89% 0.006 90); border-radius: 10px; padding: 20px; background: white; max-width: 70ch;">
+          <p style="margin: 0 0 8px; font-size: 15px; font-weight: 700;">MIT License</p>
+          <p style="margin: 0 0 14px; font-size: 14px; color: oklch(46% 0.01 90);">O projeto é distribuído sob a licença MIT. Consulte o repositório para o texto completo da licença.</p>
+          <a href="https://github.com/brolesi/taco" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px; background: oklch(21% 0.012 90); color: white; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px;">Ver repositório no GitHub ↗</a>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <footer style="border-top: 1px solid oklch(89% 0.006 90); padding: 24px; text-align: center; font-size: 13px; color: oklch(46% 0.01 90);">
+    TACO — API Estática · dados públicos, uso livre sob licença MIT.
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const BASE = 'https://brolesi.github.io/taco/';
+
+const LABELS = {
+  id: 'ID', description: 'Descrição', base_name: 'Alimento base', preparation: 'Preparação',
+  qualifiers: 'Qualificadores', category: 'Categoria',
+  moisture_pct: 'Umidade (%)', energy_kcal: 'Energia (kcal)', energy_kj: 'Energia (kJ)',
+  protein_g: 'Proteína (g)', lipids_g: 'Lipídios (g)', cholesterol_mg: 'Colesterol (mg)',
+  carbohydrate_g: 'Carboidratos (g)', dietary_fiber_g: 'Fibra alimentar (g)', ash_g: 'Cinzas (g)',
+  calcium_mg: 'Cálcio (mg)', magnesium_mg: 'Magnésio (mg)', manganese_mg: 'Manganês (mg)',
+  phosphorus_mg: 'Fósforo (mg)', iron_mg: 'Ferro (mg)', sodium_mg: 'Sódio (mg)', potassium_mg: 'Potássio (mg)',
+  copper_mg: 'Cobre (mg)', zinc_mg: 'Zinco (mg)', retinol_mcg: 'Retinol (mcg)',
+  re_mcg: 'Equiv. de retinol – RE (mcg)', rae_mcg: 'Ativ. equiv. de retinol – RAE (mcg)',
+  thiamine_mg: 'Tiamina – B1 (mg)', riboflavin_mg: 'Riboflavina – B2 (mg)', pyridoxine_mg: 'Piridoxina – B6 (mg)',
+  niacin_mg: 'Niacina (mg)', vitamin_c_mg: 'Vitamina C (mg)',
+  saturated_g: 'Saturados (g)', monounsaturated_g: 'Monoinsaturados (g)', polyunsaturated_g: 'Poli-insaturados (g)',
+  c12_0_g: 'C12:0 – Láurico (g)', c14_0_g: 'C14:0 – Mirístico (g)', c16_0_g: 'C16:0 – Palmítico (g)',
+  c18_0_g: 'C18:0 – Esteárico (g)', c20_0_g: 'C20:0 – Araquídico (g)', c22_0_g: 'C22:0 – Behênico (g)',
+  c24_0_g: 'C24:0 – Lignocérico (g)', c14_1_g: 'C14:1 – Miristoleico (g)', c16_1_g: 'C16:1 – Palmitoleico (g)',
+  c18_1_g: 'C18:1 – Oleico (g)', c20_1_g: 'C20:1 – Gadoleico (g)', c18_2_n6_g: 'C18:2 n-6 – Linoleico (g)',
+  c18_3_n3_g: 'C18:3 n-3 – Linolênico (g)', c20_4_g: 'C20:4 – Araquidônico (g)', epa_c20_5_g: 'EPA – C20:5 (g)',
+  dpa_c22_5_g: 'DPA – C22:5 (g)', dha_c22_6_g: 'DHA – C22:6 (g)', trans_c18_1_g: 'C18:1 trans (g)',
+  trans_c18_2_g: 'C18:2 trans (g)'
+};
+
+const NAV_SECTIONS = [
+  { id: 'intro', label: 'Introdução' },
+  { id: 'quickstart', label: 'Quick Start' },
+  { id: 'endpoints', label: 'Endpoints' },
+  { id: 'endpoint-index', label: '— Index', sub: true },
+  { id: 'endpoint-foods', label: '— Foods', sub: true },
+  { id: 'endpoint-food', label: '— Food', sub: true },
+  { id: 'endpoint-variants', label: '— Variants', sub: true },
+  { id: 'endpoint-categories', label: '— Categories', sub: true },
+  { id: 'endpoint-preparations', label: '— Preparations', sub: true },
+  { id: 'endpoint-measures', label: '— Measures', sub: true },
+  { id: 'nutrients', label: 'Nutrientes' },
+  { id: 'explorer', label: 'Explorar alimentos' },
+  { id: 'categories', label: 'Categorias' },
+  { id: 'preparations', label: 'Preparações' },
+  { id: 'measures', label: 'Medidas caseiras' },
+  { id: 'examples', label: 'Exemplos' },
+  { id: 'playground', label: 'Playground' },
+  { id: 'structure', label: 'Estrutura dos dados' },
+  { id: 'sources', label: 'Fontes' },
+  { id: 'license', label: 'Licença' }
+];
+
+const OBSERVED_SECTION_IDS = ['intro','quickstart','endpoints','nutrients','explorer','categories','preparations','measures','examples','playground','structure','sources','license'];
+
+const ENDPOINTS_META = [
+  { id: 'endpoint-index', path: 'index.json', description: 'Metadados da API: nome, versão, totais e a lista de endpoints disponíveis.' },
+  { id: 'endpoint-foods', path: 'foods.json', description: 'Lista os 597 alimentos da TACO com seus campos de identificação, categoria e composição nutricional.' },
+  { id: 'endpoint-food', path: 'foods/{id}.json', description: 'Composição nutricional completa de um alimento específico, por 100 g.', hasParams: true, paramsText: '{id} — identificador numérico do alimento (ex.: 1).' },
+  { id: 'endpoint-variants', path: 'foods/{id}/variants.json', description: 'Outras formas de preparo do mesmo alimento base (variações de preparação).', hasParams: true, paramsText: '{id} — identificador numérico do alimento.' },
+  { id: 'endpoint-categories', path: 'categories.json', description: 'Lista as categorias de alimentos e a quantidade de alimentos em cada uma.' },
+  { id: 'endpoint-categories-slug', path: 'categories/{slug}.json', description: 'Detalhe de uma categoria específica.', hasParams: true, paramsText: '{slug} — identificador textual da categoria (ver categories.json).' },
+  { id: 'endpoint-preparations', path: 'preparations.json', description: 'Lista as preparações (formas de preparo) reconhecidas pela base de dados.' },
+  { id: 'endpoint-measures', path: 'measures/index.json', description: 'Índice dos alimentos da POF que possuem medidas caseiras cadastradas.', hasNote: 'Indexado por pof_food_id (IBGE), não pelo id da TACO.' },
+  { id: 'endpoint-measures-detail', path: 'measures/{pof_food_id}.json', description: 'Medidas caseiras (em gramas) de um item específico da POF.', hasParams: true, paramsText: '{pof_food_id} — identificador do IBGE/POF.', hasNote: 'Não há equivalência automática entre pof_food_id e o id da TACO.' }
+];
+
+const REAL_INDEX_JSON = JSON.stringify({
+  name: 'TACO Nutritional Data API (static)', version: '1.7.0',
+  description: 'Brazilian Table of Food Composition (TACO) served as static JSON',
+  total_foods: 597, total_measures: 11801, source: 'https://github.com/brolesi/taco',
+  endpoints: ['coverage.json','categories.json','categories/{slug}.json','preparations.json','foods.json','foods/{id}.json','foods/{id}/variants.json','measures/index.json','measures/{pof_food_id}.json']
+}, null, 2);
+
+const REAL_FOOD_1_JSON = JSON.stringify({
+  id: 1, description: 'Arroz, integral, cozido', moisture_pct: 70.13867, energy_kcal: 123.53489,
+  energy_kj: 516.86999, protein_g: 2.58825, lipids_g: 1.00033, cholesterol_mg: null,
+  carbohydrate_g: 25.80975, dietary_fiber_g: 2.74933, ash_g: 0.463, calcium_mg: 5.204,
+  magnesium_mg: 58.702, manganese_mg: 0.62733, phosphorus_mg: 105.853, iron_mg: 0.262,
+  sodium_mg: 1.24467, potassium_mg: 75.15167, copper_mg: 0.02033, zinc_mg: 0.68267,
+  retinol_mcg: null, re_mcg: null, rae_mcg: null, thiamine_mg: 0.08, riboflavin_mg: 0.00001,
+  pyridoxine_mg: 0.08, niacin_mg: 0.00001, vitamin_c_mg: null, base_name: 'Arroz',
+  preparation: 'cozido', qualifiers: 'integral', category: 'Cereais e derivados',
+  fatty_acids: { saturated_g: 0.3, monounsaturated_g: 0.4, polyunsaturated_g: 0.3 }
+}, null, 2) + '\n// ... demais ácidos graxos disponíveis (ver foods/1.json)';
+
+const REAL_FOODS_JSON = JSON.stringify({
+  total: 597,
+  foods: [
+    { id: 1, category: 'Cereais e derivados', description: 'Arroz, integral, cozido' },
+    { id: 2, category: 'Cereais e derivados', description: 'Arroz, integral, cru' }
+  ]
+}, null, 2).replace(']', '  // ... + 595 alimentos\n]');
+
+const REAL_CATEGORIES_JSON = JSON.stringify([
+  { category: 'Alimentos preparados', food_count: 32 },
+  { category: 'Cereais e derivados', food_count: 63 },
+  { category: 'Carnes e derivados', food_count: 123 }
+], null, 2) + '\n// ... 15 categorias no total';
+
+class Component extends DCLogic {
+  state = {
+    isDesktop: typeof window !== 'undefined' ? window.innerWidth >= 900 : true,
+    mobileMenuOpen: false, activeSection: 'intro', qsTab: 'js', copiedId: null,
+    foodsData: null, foodsLoading: true, foodsError: null,
+    search: '', categoryFilter: '', sortKey: 'description', visibleCount: 30,
+    categoriesData: null, categoriesLoading: false, categoriesError: null,
+    coverageData: null, coverageLoading: false, coverageError: null,
+    preparationsData: null, preparationsLoading: false,
+    measuresIndexData: null, measuresIndexLoading: false,
+    measuresIdInput: '', measuresDetailData: null, measuresDetailError: null, measuresDetailLoading: false,
+    detailFood: null, detailVariants: null, detailVariantsLoading: false,
+    pgEndpoint: 'index', pgParam: '1', pgLoading: false, pgResult: null, pgError: null
+  };
+
+  componentDidMount() {
+    this._onResize = () => this.setState({ isDesktop: window.innerWidth >= 900 });
+    window.addEventListener('resize', this._onResize);
+    this.loadFoods();
+    this.loadCategories();
+    this.loadCoverage();
+    const opts = { rootMargin: '-15% 0px -70% 0px', threshold: 0 };
+    this._observer = new IntersectionObserver((entries) => {
+      const visible = entries.filter(e => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+      if (visible.length) this.setState({ activeSection: visible[0].target.id });
+    }, opts);
+    OBSERVED_SECTION_IDS.forEach(id => { const el = document.getElementById(id); if (el) this._observer.observe(el); });
+  }
+
+  componentWillUnmount() { if (this._observer) this._observer.disconnect(); window.removeEventListener('resize', this._onResize); }
+
+  label(key) { return LABELS[key] || key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()); }
+  fmt(v) { return typeof v === 'number' ? (Math.round(v * 100) / 100) : v; }
+
+  async fetchJson(path) {
+    const res = await fetch(BASE + path);
+    if (!res.ok) throw new Error('Falha ao carregar ' + path + ' (HTTP ' + res.status + ')');
+    return res.json();
+  }
+
+  loadFoods() {
+    this.setState({ foodsLoading: true, foodsError: null });
+    this.fetchJson('foods.json')
+      .then(data => this.setState({ foodsData: (data && data.foods) || [], foodsTotal: data && data.total, foodsLoading: false }))
+      .catch(err => this.setState({ foodsError: err.message, foodsLoading: false }));
+  }
+
+  loadCategories() {
+    if (this.state.categoriesData || this.state.categoriesLoading) return;
+    this.setState({ categoriesLoading: true, categoriesError: null });
+    this.fetchJson('categories.json')
+      .then(data => this.setState({ categoriesData: data, categoriesLoading: false }))
+      .catch(err => this.setState({ categoriesError: err.message, categoriesLoading: false }));
+  }
+
+  loadCoverage() {
+    if (this.state.coverageData || this.state.coverageLoading) return;
+    this.setState({ coverageLoading: true, coverageError: null });
+    this.fetchJson('coverage.json')
+      .then(data => this.setState({ coverageData: data, coverageLoading: false }))
+      .catch(err => this.setState({ coverageError: err.message, coverageLoading: false }));
+  }
+
+  loadPreparations() {
+    this.setState({ preparationsLoading: true });
+    this.fetchJson('preparations.json')
+      .then(data => this.setState({ preparationsData: JSON.stringify(data, null, 2), preparationsLoading: false }))
+      .catch(err => this.setState({ preparationsData: 'Erro: ' + err.message, preparationsLoading: false }));
+  }
+
+  loadMeasuresIndex() {
+    this.setState({ measuresIndexLoading: true });
+    this.fetchJson('measures/index.json')
+      .then(data => this.setState({ measuresIndexData: JSON.stringify(data, null, 2), measuresIndexLoading: false }))
+      .catch(err => this.setState({ measuresIndexData: 'Erro: ' + err.message, measuresIndexLoading: false }));
+  }
+
+  loadMeasuresDetail() {
+    const id = this.state.measuresIdInput.trim();
+    if (!id) { this.setState({ measuresDetailError: 'Informe um pof_food_id.' }); return; }
+    this.setState({ measuresDetailLoading: true, measuresDetailError: null, measuresDetailData: null });
+    this.fetchJson('measures/' + encodeURIComponent(id) + '.json')
+      .then(data => this.setState({ measuresDetailData: JSON.stringify(data, null, 2), measuresDetailLoading: false }))
+      .catch(err => this.setState({ measuresDetailError: err.message, measuresDetailLoading: false }));
+  }
+
+  openFood(id) {
+    this.setState({ detailFood: { id }, detailVariants: null, detailVariantsLoading: true });
+    this.fetchJson('foods/' + id + '.json')
+      .then(data => this.setState({ detailFood: data }))
+      .catch(err => this.setState({ detailFood: { id, description: 'Erro ao carregar', error: err.message } }));
+    this.fetchJson('foods/' + id + '/variants.json')
+      .then(data => this.setState({ detailVariants: Array.isArray(data) ? data.map(v => (v && v.description) ? v.description : JSON.stringify(v)) : [], detailVariantsLoading: false }))
+      .catch(() => this.setState({ detailVariants: [], detailVariantsLoading: false }));
+  }
+
+  closeDetail() { this.setState({ detailFood: null, detailVariants: null }); }
+
+  buildDetailGroups(food) {
+    const pick = (keys) => keys.map(k => ({ label: this.label(k), value: this.fmt(food[k]) }))
+      .filter(r => r.value !== null && r.value !== undefined && r.value !== '');
+    const info = pick(['id', 'description', 'base_name', 'preparation', 'qualifiers', 'category']);
+    const comp = pick(['moisture_pct','energy_kcal','energy_kj','protein_g','lipids_g','cholesterol_mg','carbohydrate_g','dietary_fiber_g','ash_g','calcium_mg','magnesium_mg','manganese_mg','phosphorus_mg','iron_mg','sodium_mg','potassium_mg','copper_mg','zinc_mg','retinol_mcg','re_mcg','rae_mcg','thiamine_mg','riboflavin_mg','pyridoxine_mg','niacin_mg','vitamin_c_mg']);
+    const groups = [{ title: 'Informações', rows: info }];
+    if (comp.length) groups.push({ title: 'Composição nutricional (por 100 g)', rows: comp });
+    if (food.fatty_acids) {
+      const fa = food.fatty_acids;
+      const fatty = Object.keys(fa).map(k => ({ label: this.label(k), value: this.fmt(fa[k]) })).filter(r => r.value !== null && r.value !== undefined);
+      if (fatty.length) groups.push({ title: 'Ácidos graxos (g por 100 g)', rows: fatty });
+    }
+    return groups;
+  }
+
+  copy(id, text) {
+    navigator.clipboard.writeText(text).then(() => {
+      this.setState({ copiedId: id });
+      setTimeout(() => this.setState(s => s.copiedId === id ? { copiedId: null } : null), 1500);
+    });
+  }
+
+  pgOptionsList() {
+    return [
+      { key: 'index', label: 'index.json — metadados', build: () => 'index.json' },
+      { key: 'coverage', label: 'coverage.json — cobertura de nutrientes', build: () => 'coverage.json' },
+      { key: 'foods', label: 'foods.json — lista de alimentos', build: () => 'foods.json' },
+      { key: 'food', label: 'foods/{id}.json — alimento específico', needsParam: true, paramLabel: 'id do alimento', build: (p) => 'foods/' + p + '.json' },
+      { key: 'variants', label: 'foods/{id}/variants.json — variações', needsParam: true, paramLabel: 'id do alimento', build: (p) => 'foods/' + p + '/variants.json' },
+      { key: 'categories', label: 'categories.json — categorias', build: () => 'categories.json' },
+      { key: 'categorySlug', label: 'categories/{slug}.json — categoria', needsParam: true, paramLabel: 'slug da categoria', build: (p) => 'categories/' + p + '.json' },
+      { key: 'preparations', label: 'preparations.json — preparações', build: () => 'preparations.json' },
+      { key: 'measuresIndex', label: 'measures/index.json — índice de medidas', build: () => 'measures/index.json' },
+      { key: 'measuresDetail', label: 'measures/{pof_food_id}.json — medidas', needsParam: true, paramLabel: 'pof_food_id', build: (p) => 'measures/' + p + '.json' }
+    ];
+  }
+
+  runPlayground() {
+    const opt = this.pgOptionsList().find(o => o.key === this.state.pgEndpoint);
+    if (!opt) return;
+    if (opt.needsParam && !this.state.pgParam.trim()) { this.setState({ pgError: 'Informe o parâmetro exigido.', pgResult: null }); return; }
+    const path = opt.build(encodeURIComponent(this.state.pgParam.trim()));
+    this.setState({ pgLoading: true, pgError: null, pgResult: null });
+    this.fetchJson(path)
+      .then(data => this.setState({ pgResult: JSON.stringify(data, null, 2), pgLoading: false }))
+      .catch(err => this.setState({ pgError: err.message, pgLoading: false }));
+  }
+
+  renderVals() {
+    const s = this.state;
+
+    const navItems = NAV_SECTIONS.map(n => ({
+      href: '#' + n.id,
+      label: n.label,
+      style: 'display: block; padding: ' + (n.sub ? '5px 0 5px 14px' : '7px 0') + '; font-size: ' + (n.sub ? '12.5px' : '13.5px') + '; font-weight: ' + (n.sub ? '500' : '600') + '; color: ' + (s.activeSection === n.id ? 'oklch(46% 0.09 170)' : 'oklch(35% 0.01 90)') + '; text-decoration: none; border-left: 2px solid ' + (s.activeSection === n.id ? 'oklch(46% 0.09 170)' : 'transparent') + '; padding-left: ' + (n.sub ? '16px' : '10px') + ';'
+    }));
+
+    const qsCodes = {
+      js: "fetch('https://brolesi.github.io/taco/foods.json')\n  .then(response => response.json())\n  .then(data => console.log(data));",
+      py: "import requests\n\nresponse = requests.get('https://brolesi.github.io/taco/foods.json')\ndata = response.json()\nprint(data[0])",
+      curl: 'curl https://brolesi.github.io/taco/foods.json'
+    };
+    const qsTabs = [
+      { key: 'js', label: 'JavaScript' }, { key: 'py', label: 'Python' }, { key: 'curl', label: 'curl' }
+    ].map(t => ({
+      label: t.label,
+      onClick: () => this.setState({ qsTab: t.key }),
+      style: 'padding: 10px 16px; border: none; background: ' + (s.qsTab === t.key ? 'white' : 'transparent') + '; border-radius: 8px 8px 0 0; font-weight: 700; font-size: 13px; cursor: pointer; font-family: inherit; color: ' + (s.qsTab === t.key ? 'oklch(46% 0.09 170)' : 'oklch(46% 0.01 90)') + '; border: 1px solid ' + (s.qsTab === t.key ? 'oklch(89% 0.006 90)' : 'transparent') + '; border-bottom: ' + (s.qsTab === t.key ? '1px solid white' : 'none') + '; margin-bottom: -1px;'
+    }));
+
+    const endpointResponses = {
+      'endpoint-index': REAL_INDEX_JSON,
+      'endpoint-foods': REAL_FOODS_JSON,
+      'endpoint-food': REAL_FOOD_1_JSON,
+      'endpoint-variants': '// Array de variações do alimento (estrutura ao vivo em GET foods/1/variants.json).\n// Explore no Playground abaixo.',
+      'endpoint-categories': REAL_CATEGORIES_JSON,
+      'endpoint-categories-slug': '// Detalhe da categoria (estrutura ao vivo).\n// Explore no Playground abaixo.',
+      'endpoint-preparations': '// Lista de preparações (estrutura ao vivo).\n// Explore na seção Preparações ou no Playground.',
+      'endpoint-measures': '// Índice de medidas por pof_food_id (estrutura ao vivo).\n// Explore na seção Medidas caseiras ou no Playground.',
+      'endpoint-measures-detail': '// Medidas caseiras do item POF (estrutura ao vivo).\n// Explore na seção Medidas caseiras ou no Playground.'
+    };
+    const endpoints = ENDPOINTS_META.map(m => ({
+      id: m.id, path: m.path, url: BASE + m.path.replace('{id}', '1').replace('{slug}', '').replace('{pof_food_id}', ''),
+      description: m.description, hasParams: !!m.hasParams, paramsText: m.paramsText || '',
+      hasNote: !!m.hasNote, note: m.hasNote || '', response: endpointResponses[m.id] || ''
+    }));
+
+    const foods = s.foodsData || [];
+    const term = s.search.trim().toLowerCase();
+    let filtered = foods.filter(f =>
+      (!term || (f.description || '').toLowerCase().includes(term) || (f.base_name || '').toLowerCase().includes(term)) &&
+      (!s.categoryFilter || f.category === s.categoryFilter)
+    );
+    filtered = filtered.slice().sort((a, b) => {
+      if (s.sortKey === 'id_asc') return (a.id || 0) - (b.id || 0);
+      if (s.sortKey === 'id_desc') return (b.id || 0) - (a.id || 0);
+      return (a.description || '').localeCompare(b.description || '');
+    });
+    const pagedFoods = filtered.slice(0, s.visibleCount).map(f => ({
+      description: f.description, category: f.category, idText: 'id ' + f.id,
+      onClick: () => this.openFood(f.id)
+    }));
+    const categoryOptions = Array.from(new Set(foods.map(f => f.category).filter(Boolean))).sort();
+
+    const coverageRows = s.coverageData ? s.coverageData.composition.slice().sort((a, b) => b.coverage_pct - a.coverage_pct).map(c => ({
+      label: this.label(c.field), text: c.with_data + ' / ' + s.coverageData.total_foods + ' (' + c.coverage_pct + '%)', width: c.coverage_pct + '%'
+    })) : [];
+    const coverageTables = s.coverageData ? Object.keys(s.coverageData.tables).map(k => ({
+      name: this.label(k), text: s.coverageData.tables[k].foods + ' alimentos (' + s.coverageData.tables[k].coverage_pct + '%)'
+    })) : [];
+
+    const categoriesList = (s.categoriesData || []).map(c => ({
+      category: c.category, count: c.food_count,
+      onClick: () => this.setState({ categoryFilter: c.category }, () => {
+        const el = document.getElementById('explorer');
+        if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 70, behavior: 'smooth' });
+      })
+    }));
+
+    const detailGroups = s.detailFood && !s.detailFood.error ? this.buildDetailGroups(s.detailFood) : [];
+
+    const pgOpt = this.pgOptionsList().find(o => o.key === s.pgEndpoint) || this.pgOptionsList()[0];
+    const pgPath = pgOpt.needsParam ? pgOpt.build(s.pgParam.trim() || '{param}') : pgOpt.build();
+
+    const examplesRaw = [
+      { title: 'Encontrar todos os alimentos', description: 'Lista todos os alimentos disponíveis na base.',
+        code: "fetch('https://brolesi.github.io/taco/foods.json')\n  .then(r => r.json())\n  .then(foods => console.log(foods.length, 'alimentos'));",
+        result: '597 alimentos' },
+      { title: 'Buscar um alimento por id', description: 'Obtém a composição completa de um alimento específico.',
+        code: "fetch('https://brolesi.github.io/taco/foods/1.json')\n  .then(r => r.json())\n  .then(food => console.log(food.description));",
+        result: '"Arroz, integral, cozido"' },
+      { title: 'Consultar composição nutricional', description: 'Extrai apenas os campos de composição de um alimento.',
+        code: "fetch('https://brolesi.github.io/taco/foods/1.json')\n  .then(r => r.json())\n  .then(f => console.log(f.energy_kcal, f.protein_g, f.carbohydrate_g));",
+        result: '123.53 2.59 25.81' },
+      { title: 'Consultar variantes de um alimento', description: 'Lista outras formas de preparo do mesmo alimento base.',
+        code: "fetch('https://brolesi.github.io/taco/foods/1/variants.json')\n  .then(r => r.json())\n  .then(variants => console.log(variants));" },
+      { title: 'Consultar categorias', description: 'Lista as categorias e quantos alimentos cada uma tem.',
+        code: "fetch('https://brolesi.github.io/taco/categories.json')\n  .then(r => r.json())\n  .then(cats => console.log(cats));",
+        result: '15 categorias, ex.: "Cereais e derivados": 63 alimentos' },
+      { title: 'Consultar preparações', description: 'Lista as preparações reconhecidas pela base.',
+        code: "fetch('https://brolesi.github.io/taco/preparations.json')\n  .then(r => r.json())\n  .then(preps => console.log(preps));" },
+      { title: 'Consultar medidas caseiras', description: 'Busca as medidas caseiras de um item da POF (id do IBGE, não da TACO).',
+        code: "fetch('https://brolesi.github.io/taco/measures/index.json')\n  .then(r => r.json())\n  .then(index => console.log(index));" },
+      { title: 'Usar a API em Python', description: 'Mesma requisição, feita com a biblioteca requests.',
+        code: "import requests\n\nr = requests.get('https://brolesi.github.io/taco/categories.json')\nprint(r.json())" }
+    ];
+    const examples = examplesRaw.map((ex, i) => ({
+      title: ex.title, description: ex.description, code: ex.code,
+      hasResult: !!ex.result, result: ex.result || '',
+      copyLabel: s.copiedId === 'ex' + i ? 'Copiado!' : 'Copiar',
+      onCopy: () => this.copy('ex' + i, ex.code)
+    }));
+
+    return {
+      desktopNavStyle: 'display: ' + (s.isDesktop ? 'flex' : 'none') + '; align-items: center; gap: 24px; font-size: 14px; font-weight: 600;',
+      mobileToggleStyle: 'display: ' + (s.isDesktop ? 'none' : 'flex') + '; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 8px; border: 1px solid oklch(89% 0.006 90); background: white;',
+      sidebarStyle: 'display: ' + (s.isDesktop ? 'block' : 'none') + '; position: sticky; top: 78px; max-height: calc(100vh - 100px); overflow-y: auto; padding-right: 8px;',
+      heroGridStyle: 'padding: 64px 24px 56px; max-width: 1160px; margin: 0 auto; display: grid; grid-template-columns: ' + (s.isDesktop ? '1.1fr 1fr' : '1fr') + '; gap: 48px; align-items: center;',
+      layoutGridStyle: 'max-width: 1160px; margin: 0 auto; display: grid; grid-template-columns: ' + (s.isDesktop ? '220px 1fr' : '1fr') + '; gap: 40px; padding: 0 24px 80px; align-items: start;',
+      mobileMenuOpen: s.mobileMenuOpen,
+      toggleMobileMenu: () => this.setState(st => ({ mobileMenuOpen: !st.mobileMenuOpen })),
+      closeMobileMenu: () => this.setState({ mobileMenuOpen: false }),
+      stopPropagation: (e) => e.stopPropagation(),
+
+      heroStats: ['597 alimentos', 'JSON', 'API estática', 'sem API key', 'sem servidor', 'GitHub Pages'],
+      navItems,
+
+      qsTabs, qsCode: qsCodes[s.qsTab],
+      qsCopyLabel: s.copiedId === 'qs' ? 'Copiado!' : 'Copiar',
+      copyQuickstart: () => this.copy('qs', qsCodes[s.qsTab]),
+
+      endpoints,
+
+      coverageLoading: s.coverageLoading, coverageError: s.coverageError,
+      hasCoverage: !!s.coverageData, coverageRows, coverageTables,
+
+      search: s.search, onSearchChange: (e) => this.setState({ search: e.target.value, visibleCount: 30 }),
+      categoryFilter: s.categoryFilter, onCategoryChange: (e) => this.setState({ categoryFilter: e.target.value, visibleCount: 30 }),
+      categoryOptions,
+      sortKey: s.sortKey, onSortChange: (e) => this.setState({ sortKey: e.target.value }),
+      foodsLoading: s.foodsLoading, foodsError: s.foodsError,
+      hasFoods: !s.foodsLoading && !s.foodsError && filtered.length > 0,
+      noResults: !s.foodsLoading && !s.foodsError && s.foodsData && filtered.length === 0,
+      resultCountText: filtered.length + ' alimento' + (filtered.length === 1 ? '' : 's') + ' encontrado' + (filtered.length === 1 ? '' : 's'),
+      pagedFoods, hasMore: filtered.length > s.visibleCount,
+      loadMore: () => this.setState(st => ({ visibleCount: st.visibleCount + 30 })),
+
+      detailFood: s.detailFood, detailGroups,
+      detailVariantsLoading: s.detailVariantsLoading,
+      hasVariants: !s.detailVariantsLoading && s.detailVariants && s.detailVariants.length > 0,
+      noVariants: !s.detailVariantsLoading && s.detailVariants && s.detailVariants.length === 0,
+      detailVariants: s.detailVariants || [],
+      closeDetail: () => this.closeDetail(),
+
+      categoriesLoading: s.categoriesLoading,
+      categoriesTotalText: s.categoriesData ? s.categoriesData.length + ' categorias, ' + foods.length + ' alimentos classificados.' : 'Carregando…',
+      categoriesList,
+
+      preparationsButtonLabel: s.preparationsLoading ? 'Carregando…' : (s.preparationsData ? 'Recarregar' : 'Carregar preparations.json'),
+      preparationsData: s.preparationsData,
+      loadPreparations: () => this.loadPreparations(),
+
+      measuresIndexButtonLabel: s.measuresIndexLoading ? 'Carregando…' : (s.measuresIndexData ? 'Recarregar' : 'Carregar measures/index.json'),
+      measuresIndexData: s.measuresIndexData,
+      loadMeasuresIndex: () => this.loadMeasuresIndex(),
+      measuresIdInput: s.measuresIdInput,
+      onMeasuresIdChange: (e) => this.setState({ measuresIdInput: e.target.value }),
+      measuresDetailData: s.measuresDetailData, measuresDetailError: s.measuresDetailError,
+      loadMeasuresDetail: () => this.loadMeasuresDetail(),
+
+      examples,
+
+      pgEndpoint: s.pgEndpoint, pgOptions: this.pgOptionsList(),
+      onPgEndpointChange: (e) => this.setState({ pgEndpoint: e.target.value, pgResult: null, pgError: null }),
+      pgNeedsParam: !!pgOpt.needsParam, pgParamLabel: pgOpt.paramLabel || '',
+      pgParam: s.pgParam, onPgParamChange: (e) => this.setState({ pgParam: e.target.value }),
+      pgButtonLabel: s.pgLoading ? 'Executando…' : 'Executar',
+      pgUrl: 'GET ' + BASE + pgPath,
+      runPlayground: () => this.runPlayground(),
+      pgError: s.pgError, pgResult: s.pgResult,
+      pgCopyLabel: s.copiedId === 'pg' ? 'Copiado!' : 'Copiar',
+      copyPgResult: () => this.copy('pg', s.pgResult || ''),
+      openPgEndpoint: () => window.open(BASE + pgPath, '_blank')
+    };
+  }
+}
+
+</script>
+</body>
+</html>

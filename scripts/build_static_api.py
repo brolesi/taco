@@ -63,11 +63,14 @@ PAGINA_INICIAL = """<!doctype html>
  body{{font:16px/1.6 system-ui,sans-serif;max-width:44rem;margin:3rem auto;padding:0 1.2rem}}
  code{{background:#f2f2f2;padding:.1em .35em;border-radius:3px}}
  li{{margin:.3rem 0}}
+ a.primary{{display:inline-block;background:#2f6d5e;color:white;padding:10px 16px;border-radius:6px;text-decoration:none;font-weight:600;margin-bottom:2rem}}
 </style>
 <h1>TACO — API estática</h1>
 <p>Tabela Brasileira de Composição de Alimentos (4ª edição, NEPA/UNICAMP) e
 medidas caseiras da POF 2008-2009 (IBGE), servidas como arquivos JSON.
 Versão {versao}. Sem servidor, sem chave, sem limite de requisições.</p>
+<a class="primary" href="api.dc.html">📖 Documentação Interativa</a>
+<h3>Endpoints JSON</h3>
 <ul>
  <li><code><a href="index.json">index.json</a></code> — metadados e índice</li>
  <li><code><a href="coverage.json">coverage.json</a></code> — cobertura por nutriente</li>
@@ -163,6 +166,13 @@ def construir(saida_dir: Path) -> int:
     )
     # Impede o Jekyll do GitHub Pages de ignorar diretórios iniciados por "_".
     (saida_dir / ".nojekyll").write_text("", encoding="utf-8")
+
+    # Copiar documentação interativa (Design Component)
+    docs_dir = RAIZ_PROJETO / "docs"
+    for arquivo in ["api.dc.html", "support.js"]:
+        src = docs_dir / arquivo
+        if src.exists():
+            shutil.copy(src, saida_dir / arquivo)
 
     return sum(1 for _ in saida_dir.rglob("*") if _.is_file())
 
