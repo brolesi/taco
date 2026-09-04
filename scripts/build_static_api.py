@@ -63,7 +63,8 @@ PAGINA_INICIAL = """<!doctype html>
  body{{font:16px/1.6 system-ui,sans-serif;max-width:44rem;margin:3rem auto;padding:0 1.2rem}}
  code{{background:#f2f2f2;padding:.1em .35em;border-radius:3px}}
  li{{margin:.3rem 0}}
- a.primary{{display:inline-block;background:#2f6d5e;color:white;padding:10px 16px;border-radius:6px;text-decoration:none;font-weight:600;margin-bottom:2rem}}
+ a.primary{{display:inline-block;background:#2f6d5e;color:white;padding:10px 16px;
+            border-radius:6px;text-decoration:none;font-weight:600;margin-bottom:2rem}}
 </style>
 <h1>TACO — API estática</h1>
 <p>Tabela Brasileira de Composição de Alimentos (4ª edição, NEPA/UNICAMP) e
