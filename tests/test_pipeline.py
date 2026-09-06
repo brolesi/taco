@@ -43,9 +43,7 @@ def test_facetar_descricao():
     )
 
 
-@pytest.mark.skipif(
-    not POF_ENTRADA.is_file(), reason="planilha da POF ausente em data/raw/pof/"
-)
+@pytest.mark.skipif(not POF_ENTRADA.is_file(), reason="planilha da POF ausente em data/raw/pof/")
 def test_csv_da_pof_e_reproduzivel(tmp_path):
     assert pof_main(["--saida-dir", str(tmp_path)]) == 0
     assert (tmp_path / POF_ARQUIVO).read_bytes() == (POF_SAIDA / POF_ARQUIVO).read_bytes()

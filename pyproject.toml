@@ -20,5 +20,5 @@ extend-immutable-calls = ["fastapi.Query", "fastapi.Depends"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q"
+addopts = "-q --cov=api --cov=scripts --cov-report=term-missing --cov-fail-under=85"
 pythonpath = ["."]

@@ -426,9 +426,7 @@ def get_category(name: str):
 @app.get("/preparations", tags=["categories"])
 def list_preparations():
     """Formas de preparo reconhecidas e quantos alimentos há em cada uma."""
-    counts = (
-        df_composition.groupby("preparation").size().reset_index(name="food_count")
-    )
+    counts = df_composition.groupby("preparation").size().reset_index(name="food_count")
     return counts.sort_values("preparation").to_dict(orient="records")
 
 
@@ -597,9 +595,7 @@ def sum_nutrients(body: SumRequest):
     for item in body.items:
         food = _get_food(item.id)
         factor = item.grams / 100.0
-        foods_used.append(
-            {"id": item.id, "description": food["description"], "grams": item.grams}
-        )
+        foods_used.append({"id": item.id, "description": food["description"], "grams": item.grams})
         for key in nutrient_keys:
             val = food.get(key)
             if val is None:

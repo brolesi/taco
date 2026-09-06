@@ -72,9 +72,7 @@ def construir(saida: Path, processados: Path = PROCESSADOS) -> Path:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument(
-        "--saida", type=Path, default=SAIDA_PADRAO, help="Arquivo .sqlite gerado"
-    )
+    parser.add_argument("--saida", type=Path, default=SAIDA_PADRAO, help="Arquivo .sqlite gerado")
     args = parser.parse_args(argv)
 
     logging.basicConfig(

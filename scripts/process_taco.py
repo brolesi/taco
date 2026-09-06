@@ -239,9 +239,7 @@ def processar_aba(
     df["numero_alimento"] = df["numero_alimento"].astype(int)
 
     if mapa_categorias is not None:
-        df["categoria"] = df["categoria"].fillna(
-            df["numero_alimento"].map(mapa_categorias)
-        )
+        df["categoria"] = df["categoria"].fillna(df["numero_alimento"].map(mapa_categorias))
 
     df = df.replace("Tr", VALOR_TRACO)
 
@@ -303,9 +301,7 @@ def main(argv: list[str] | None = None) -> int:
         try:
             df = processar_aba(args.entrada, config, args.saida_dir, mapa_categorias)
             if mapa_categorias is None:
-                mapa_categorias = dict(
-                    zip(df["numero_alimento"], df["categoria"], strict=True)
-                )
+                mapa_categorias = dict(zip(df["numero_alimento"], df["categoria"], strict=True))
         except Exception:
             logging.exception("Falha ao processar a aba '%s'", config.sheet_name)
             falhas += 1
