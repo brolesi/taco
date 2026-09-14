@@ -9,7 +9,7 @@ Em vez disso, use o formulário de divulgação privada do GitHub:
 2. Clique em **Report a vulnerability**
 3. Descreva a vulnerabilidade com detalhes e passos para reproduzir
 
-Você também pode enviar um email para **taco@fabio.mat.br** com a descrição.
+Você também pode enviar um email para: taco [at] fabio [dot] mat [dot] br
 
 ## Versões Suportadas
 
