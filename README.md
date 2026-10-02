@@ -32,6 +32,147 @@ taco/
 └── tests/                # Testes da API
 ```
 
+### Arquitetura
+
+```mermaid
+flowchart LR
+  subgraph Originais[Fontes originais - imutáveis]
+    direction TB
+    TACO_XLS["TACO .xls<br/>3 abas nutricionais"]
+    POF_XLS["POF .xls<br/>medidas caseiras"]
+    REFERENCIAS["references/<br/>fontes e decisões de normalização"]
+  end
+
+  subgraph Pipelines[Transformação reproduzível]
+    direction TB
+    PTACO["scripts/process_taco.py<br/>pandas + xlrd"]
+    PPOF["scripts/process_pof.py<br/>pandas + xlrd"]
+    REGRAS["regras de domínio<br/>categorias, Tr e NaN"]
+  end
+
+  subgraph Canonicos[Dados canônicos versionados]
+    direction TB
+    COMPOSICAO["taco_composicao.csv<br/>composição, minerais e vitaminas"]
+    GORDURAS["taco_acidos_graxos.csv<br/>perfil de ácidos graxos"]
+    AMINO["taco_aminoacidos.csv<br/>perfil de aminoácidos"]
+    MEDIDAS["pof_medidas_caseiras.csv<br/>medidas em gramas"]
+  end
+
+  subgraph Aplicacao[Camada de aplicação]
+    direction TB
+    MAIN["api/main.py<br/>FastAPI + contrato público"]
+    DATAFRAMES["DataFrames em memória<br/>carregados no import"]
+    ROTAS["rotas REST<br/>busca, composição, comparação e soma"]
+    MAIN --> DATAFRAMES --> ROTAS
+  end
+
+  subgraph Publicacoes[Publicações e consumidores]
+    direction TB
+    ESTATICA["scripts/build_static_api.py<br/>JSON estático"]
+    CDN["GitHub Pages / CDN<br/>sem servidor"]
+    SQLITE["scripts/build_sqlite.py<br/>taco.sqlite não versionado"]
+    CLIENTE_API["cliente HTTP<br/>Swagger ou aplicação"]
+    CLIENTE_CDN["cliente HTTP<br/>curl ou aplicação"]
+    CLIENTE_SQL["cliente SQL<br/>SQLite"]
+  end
+
+  TACO_XLS --> PTACO
+  POF_XLS --> PPOF
+  REFERENCIAS -.-> REGRAS
+  REGRAS -.-> PTACO
+  REGRAS -.-> PPOF
+  PTACO --> COMPOSICAO
+  PTACO --> GORDURAS
+  PTACO --> AMINO
+  PPOF --> MEDIDAS
+  COMPOSICAO --> MAIN
+  GORDURAS --> MAIN
+  AMINO --> MAIN
+  MEDIDAS --> MAIN
+  ROTAS --> CLIENTE_API
+  MAIN --> ESTATICA --> CDN --> CLIENTE_CDN
+  COMPOSICAO --> SQLITE
+  GORDURAS --> SQLITE
+  AMINO --> SQLITE
+  MEDIDAS --> SQLITE --> CLIENTE_SQL
+```
+
+### Fluxos principais
+
+```mermaid
+flowchart TD
+  subgraph TACO[Pipeline TACO]
+    direction TB
+    T1["ler as 3 abas da planilha"]
+    T2["processar composição primeiro"]
+    T3["forward-fill dos separadores<br/>para obter categorias"]
+    T4["filtrar linhas de dados<br/>e normalizar nomes"]
+    T5["converter Tr para 1e-5<br/>e preservar ausentes como NaN"]
+    T6["gerar composição, ácidos graxos<br/>e aminoácidos"]
+    T1 --> T2 --> T3 --> T4 --> T5 --> T6
+    T2 -.->|join da categoria| T6
+  end
+
+  subgraph POF[Pipeline POF independente]
+    direction TB
+    P1["ler tabelamedidas_bd.xls"]
+    P2["normalizar medidas caseiras"]
+    P3["converter quantidades para gramas"]
+    P4["gerar pof_medidas_caseiras.csv"]
+    P1 --> P2 --> P3 --> P4
+  end
+
+  T6 --> CSV_TACO["CSVs TACO<br/>versionados e reproduzíveis"]
+  P4 --> CSV_POF["CSV POF<br/>versionado e reproduzível"]
+  CSV_TACO --> TESTES["pytest<br/>confere a saída byte a byte"]
+  CSV_POF --> TESTES
+  TESTES --> CI["CI<br/>ruff check + pytest"]
+
+  CSV_TACO --> LOAD["api.main<br/>carrega DataFrames no import"]
+  CSV_POF --> LOAD
+  LOAD --> CONTRATO["mapeia colunas pt-BR<br/>para campos públicos em inglês"]
+  CONTRATO --> REST["API REST dinâmica"]
+  CONTRATO --> BUILD_JSON["build_static_api.py<br/>reutiliza funções da API"]
+  BUILD_JSON --> JSON["JSON estático<br/>GitHub Pages"]
+
+  CSV_TACO --> BUILD_SQL["build_sqlite.py"]
+  CSV_POF --> BUILD_SQL
+  BUILD_SQL --> SQLITE["taco.sqlite<br/>4 tabelas + índices + metadados"]
+```
+
+### Ciclo de uma consulta
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant C as Cliente
+  participant F as FastAPI
+  participant D as DataFrames
+  participant V as Validação e normalização
+  participant R as Resposta JSON
+
+  Note over F,D: No startup/import, api.main lê os CSVs processados
+  C->>F: GET /foods?search=arroz&limit=3
+  F->>D: filtra alimentos e pagina resultados
+  D->>V: normaliza busca sem acentos
+  V-->>D: critérios normalizados
+  D-->>F: registros encontrados
+  F->>R: traduz colunas para o contrato público
+  R-->>C: 200 OK + lista de alimentos
+
+  C->>F: GET /foods/{id}
+  F->>D: consulta composição por id
+  D-->>F: composição, categoria e preparo
+  F->>R: arredonda valores em 5 casas decimais
+  R-->>C: 200 OK + composição completa
+
+  C->>F: POST /foods/sum
+  F->>D: carrega itens e gramas
+  D->>D: pondera cada item por grams / 100
+  D-->>F: totais e missing_values
+  F-->>C: 200 OK + nutrientes somados
+```
+
 ## Início rápido
 
 Requer **Python 3.10+**.
@@ -82,23 +223,23 @@ Todos os valores nutricionais referem-se a **100 g de parte comestível**.
 Os nomes de campo da API estão mapeados no
 [dicionário de dados](docs/dicionario-dados.md).
 
-| Método | Rota | Descrição |
-|---|---|---|
-| GET | `/` | Metadados da API |
-| GET | `/health` | Verificação de saúde |
-| GET | `/coverage` | Quantos alimentos têm dado para cada nutriente |
-| GET | `/categories` | Categorias e contagem de alimentos |
-| GET | `/categories/{nome}` | Alimentos de uma categoria |
-| GET | `/preparations` | Formas de preparo e contagem de alimentos |
-| GET | `/measures?search=&measure=` | Peso em gramas de medidas caseiras (POF) |
-| GET | `/measures/types` | Tipos de medida caseira e sua frequência |
-| GET | `/foods?search=&base_name=&preparation=&skip=&limit=` | Lista/busca paginada de alimentos (busca ignora acentos) |
-| GET | `/foods/{id}` | Composição completa de um alimento |
-| GET | `/foods/{id}/variants` | O mesmo alimento em outras formas de preparo |
-| GET | `/foods/{id}/fatty-acids` | Perfil de ácidos graxos |
-| GET | `/foods/{id}/amino-acids` | Perfil de aminoácidos |
-| POST | `/foods/compare` | Compara a composição de 2+ alimentos |
-| POST | `/foods/sum` | Soma nutrientes ponderados por gramas (`missing_values` lista nutrientes sem dado) |
+| Método | Rota                                                  | Descrição                                                                          |
+| ------ | ----------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| GET    | `/`                                                   | Metadados da API                                                                   |
+| GET    | `/health`                                             | Verificação de saúde                                                               |
+| GET    | `/coverage`                                           | Quantos alimentos têm dado para cada nutriente                                     |
+| GET    | `/categories`                                         | Categorias e contagem de alimentos                                                 |
+| GET    | `/categories/{nome}`                                  | Alimentos de uma categoria                                                         |
+| GET    | `/preparations`                                       | Formas de preparo e contagem de alimentos                                          |
+| GET    | `/measures?search=&measure=`                          | Peso em gramas de medidas caseiras (POF)                                           |
+| GET    | `/measures/types`                                     | Tipos de medida caseira e sua frequência                                           |
+| GET    | `/foods?search=&base_name=&preparation=&skip=&limit=` | Lista/busca paginada de alimentos (busca ignora acentos)                           |
+| GET    | `/foods/{id}`                                         | Composição completa de um alimento                                                 |
+| GET    | `/foods/{id}/variants`                                | O mesmo alimento em outras formas de preparo                                       |
+| GET    | `/foods/{id}/fatty-acids`                             | Perfil de ácidos graxos                                                            |
+| GET    | `/foods/{id}/amino-acids`                             | Perfil de aminoácidos                                                              |
+| POST   | `/foods/compare`                                      | Compara a composição de 2+ alimentos                                               |
+| POST   | `/foods/sum`                                          | Soma nutrientes ponderados por gramas (`missing_values` lista nutrientes sem dado) |
 
 Exemplo:
 
@@ -113,12 +254,12 @@ curl -X POST "http://127.0.0.1:8000/foods/sum" \
 
 ## Dados
 
-| Arquivo | Conteúdo | Registros |
-|---|---|---|
-| `data/processed/taco/taco_composicao.csv` | Composição centesimal, minerais e vitaminas | 597 |
-| `data/processed/taco/taco_acidos_graxos.csv` | Perfil de ácidos graxos | 423 |
-| `data/processed/taco/taco_aminoacidos.csv` | Perfil de aminoácidos | 26 |
-| `data/processed/pof/pof_medidas_caseiras.csv` | Medidas caseiras em gramas (POF/IBGE) | 11.801 |
+| Arquivo                                       | Conteúdo                                    | Registros |
+| --------------------------------------------- | ------------------------------------------- | --------- |
+| `data/processed/taco/taco_composicao.csv`     | Composição centesimal, minerais e vitaminas | 597       |
+| `data/processed/taco/taco_acidos_graxos.csv`  | Perfil de ácidos graxos                     | 423       |
+| `data/processed/taco/taco_aminoacidos.csv`    | Perfil de aminoácidos                       | 26        |
+| `data/processed/pof/pof_medidas_caseiras.csv` | Medidas caseiras em gramas (POF/IBGE)       | 11.801    |
 
 Cada release traz também um **`taco.sqlite`** anexado, com as quatro tabelas em
 um arquivo só — para consultar em SQL sem instalar Python nem subir a API:
