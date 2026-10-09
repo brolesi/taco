@@ -1,8 +1,12 @@
 """Testes do pipeline de processamento da planilha TACO."""
 
+import json
+from pathlib import Path
+
 import pandas as pd
 import pytest
 
+from api.main import API_VERSION
 from scripts.build_sqlite import TABELAS, construir
 from scripts.process_pof import ARQUIVO_SAIDA as POF_ARQUIVO
 from scripts.process_pof import ENTRADA_PADRAO as POF_ENTRADA
@@ -73,3 +77,13 @@ def test_sqlite_reune_os_quatro_csvs(tmp_path):
         # A procedência viaja junto: quem baixa só o arquivo não tem o README.
         meta = dict(conn.execute("SELECT chave, valor FROM metadados"))
         assert "TACO" in meta["fonte_taco"] and meta["repositorio"].startswith("https://")
+
+
+def test_datapackage_acompanha_versao_e_colunas():
+    # O datapackage.json é mantido à mão; a validação completa (tipos, chaves,
+    # restrições) é o `frictionless validate` do CI. Aqui só o que ele não vê.
+    raiz = Path(__file__).resolve().parents[1]
+    pacote = json.loads((raiz / "datapackage.json").read_text(encoding="utf-8"))
+    assert pacote["version"] == API_VERSION
+    caminhos = {r["path"] for r in pacote["resources"]}
+    assert caminhos == {p.relative_to(raiz).as_posix() for p in raiz.glob("data/processed/*/*.csv")}

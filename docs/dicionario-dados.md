@@ -6,6 +6,14 @@ Os arquivos em [`data/processed/taco/`](../data/processed/taco/) são gerados po
 
 Todos os valores nutricionais referem-se a **100 g de parte comestível** do alimento.
 
+A versão legível por máquina deste dicionário é o
+[`datapackage.json`](../datapackage.json) (Frictionless Data), com tipos,
+unidades, chaves primárias e restrições de cada coluna. Ele exige valor ≥ 0 em
+todos os nutrientes, **exceto** `carboidrato_g`: calculado por diferença, ele
+tem quatro médias levemente negativas na planilha original (corimba crua,
+tucunaré cru, capa de contra-filé grelhada e fígado de frango cru, de −0,007 a
+−0,045 g), mantidas como estão.
+
 ## Valores especiais
 
 | Valor no CSV | Origem na planilha | Significado |

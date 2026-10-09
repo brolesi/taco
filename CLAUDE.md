@@ -14,12 +14,14 @@ Anaconda em `C:\Users\suzan\anaconda3\python.exe -m venv .venv` e instale
 .venv\Scripts\python.exe -m pytest tests/test_api.py::test_get_food  # um teste
 .venv\Scripts\python.exe -m ruff check .                 # lint (CI falha se não passar)
 .venv\Scripts\python.exe -m ruff format --check .       # formatação (CI falha se não passar; sem --check aplica)
+.venv\Scripts\frictionless.exe validate datapackage.json  # CSVs x esquema
 .venv\Scripts\python.exe scripts\process_taco.py         # regenera os CSVs processados
 .venv\Scripts\python.exe -m uvicorn api.main:app --reload  # sobe a API (ou run.bat)
 ```
 
-O CI (`.github/workflows/ci.yml`) roda `ruff check .`, `ruff format --check .` e
-`pytest` em cada push/PR para `main`. Configuração de ruff/pytest em `pyproject.toml` (linha de 100 chars;
+O CI (`.github/workflows/ci.yml`) roda `ruff check .`, `ruff format --check .`,
+`frictionless validate datapackage.json` e `pytest` em cada push/PR para `main`.
+Configuração de ruff/pytest em `pyproject.toml` (linha de 100 chars;
 `pythonpath = ["."]` é o que permite `from api.main import app` nos testes).
 
 ## Arquitetura
@@ -40,6 +42,10 @@ de banco de dados:
    módulo e traduz as colunas para o contrato público em inglês
    (`COMPOSITION_COLUMNS` etc.). Mudanças de contrato devem ser refletidas em
    `docs/dicionario-dados.md` e registradas no `CHANGELOG.md`.
+
+`datapackage.json` (Frictionless Data) descreve o esquema dos 4 CSVs e é mantido
+à mão: se o pipeline mudar uma coluna, atualize-o (o CI valida os CSVs contra
+ele). Sua `version` acompanha `API_VERSION` (há teste).
 
 `scripts/process_pof.py` é o segundo pipeline, independente: lê
 `data/raw/pof/tabelamedidas_bd.xls` e gera
