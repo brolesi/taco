@@ -1,0 +1,6 @@
+# O Dockerfile copia só api/ e data/processed/; isto só encolhe o contexto de build.
+*
+!requirements.txt
+!api/
+!data/processed/
+**/__pycache__

@@ -3,6 +3,16 @@
 Este arquivo segue o formato [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.12.0] - 2026-10-09
+
+### Adicionado
+
+- `Dockerfile`: sobe a API sem Python local (`docker build -t taco .` e
+  `docker run -p 8000:8000 taco`). A imagem leva só `api/` e
+  `data/processed/` e roda sem root.
+- Job `docker` no CI: constrói a imagem, sobe o contêiner e consulta
+  `/health` e `/foods/561` — é o único lugar onde o Dockerfile é testado.
+
 ## [1.11.0] - 2026-10-09
 
 ### Adicionado
@@ -227,6 +237,7 @@ endpoints referem-se ao protótipo anterior, que não chegou a ser versionado.
   pipeline de processamento (`notebooks/01-process-taco.py`) e CSVs
   normalizados em `data/processed/taco/`. A API REST só veio na 1.1.0.
 
+[1.12.0]: https://github.com/brolesi/taco/compare/v1.11.0...v1.12.0
 [1.11.0]: https://github.com/brolesi/taco/compare/v1.10.0...v1.11.0
 [1.10.0]: https://github.com/brolesi/taco/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/brolesi/taco/compare/v1.8.0...v1.9.0
