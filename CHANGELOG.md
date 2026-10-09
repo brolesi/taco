@@ -3,6 +3,17 @@
 Este arquivo segue o formato [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.9.0] - 2026-10-09
+
+### Adicionado
+
+- `GET /consistency` (e `consistency.json` na API estática): alimentos em que a
+  planilha da TACO contradiz a metodologia publicada — 7 com fibra acima do
+  carboidrato total (que a inclui), 2 com kJ ≠ kcal × 4,184 e a cerveja, cujas
+  frações não somam 100 g por falta do teor alcoólico. Os dados não são
+  alterados. A energia não é recalculada: a TACO usou fatores de Atwater
+  específicos que não estão na tabela, e 4/4/9 daria ~167 falsos positivos.
+
 ## [1.8.0] - 2026-10-09
 
 ### Adicionado
@@ -191,6 +202,7 @@ endpoints referem-se ao protótipo anterior, que não chegou a ser versionado.
   pipeline de processamento (`notebooks/01-process-taco.py`) e CSVs
   normalizados em `data/processed/taco/`. A API REST só veio na 1.1.0.
 
+[1.9.0]: https://github.com/brolesi/taco/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/brolesi/taco/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/brolesi/taco/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/brolesi/taco/compare/v1.5.0...v1.6.0

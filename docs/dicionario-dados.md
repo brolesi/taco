@@ -177,6 +177,27 @@ No ranking (`GET /foods?sort=`), alimentos sem dado para o nutriente ordenado
 vão para o fim da lista em qualquer direção, e `min_value`/`max_value` os
 excluem — ausência não é tratada como zero em nenhum dos dois casos.
 
+## Consistência dos dados
+
+A planilha da TACO contradiz, em poucos alimentos, a metodologia que a própria
+publicação descreve. Os CSVs mantêm os valores originais; `GET /consistency`
+lista os casos para que o consumidor saiba onde desconfiar:
+
+| Verificação | Regra da metodologia | Alimentos |
+|---|---|---|
+| `fiber_exceeds_carbohydrate` | O carboidrato (por diferença) inclui a fibra alimentar | 7 — alface crespa, cebolinha, jurubeba, abacate, pequi, caldo de galinha em tablete, tremoço |
+| `energy_kj_mismatch` | 1 kcal = 4,184 kJ (tolerância de 1 kJ) | 2 — corvina do mar crua, ervilha em vagem |
+| `proximates_not_100g` | Umidade + proteína + lipídeos + carboidrato + cinzas = 100 g (tolerância de 1 g) | 1 — cerveja pilsen, cujo teor alcoólico não está na planilha |
+
+A verificação de 100 g ignora alimentos com carboidrato zero: em carnes e
+peixes a TACO registra zero em vez da diferença (que daria negativa ou
+desprezível), e 44 deles se afastam de 100 g por até 3,4 g por esse motivo.
+
+A energia **não** é recalculada a partir dos macronutrientes. A TACO usou
+fatores de Atwater específicos por alimento, que não constam da tabela, e
+álcool a 6,93 kcal/g; com os fatores genéricos 4/4/9, cerca de 167 alimentos
+pareceriam errados sem estar.
+
 ## `pof_medidas_caseiras.csv` (11.801 registros)
 
 Gerado por [`scripts/process_pof.py`](../scripts/process_pof.py) a partir de

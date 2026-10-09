@@ -24,6 +24,7 @@ from pathlib import Path
 
 from api.main import (
     API_VERSION,
+    consistency,
     coverage,
     df_composition,
     df_measures,
@@ -75,6 +76,7 @@ Versão {versao}. Sem servidor, sem chave, sem limite de requisições.</p>
 <ul>
  <li><code><a href="index.json">index.json</a></code> — metadados e índice</li>
  <li><code><a href="coverage.json">coverage.json</a></code> — cobertura por nutriente</li>
+ <li><code><a href="consistency.json">consistency.json</a></code> — inconsistências da TACO</li>
  <li><code><a href="foods.json">foods.json</a></code> — os {n_foods} alimentos</li>
  <li><code><a href="foods/1.json">foods/{{id}}.json</a></code> — composição completa</li>
  <li><code><a href="foods/1/variants.json">foods/{{id}}/variants.json</a></code>
@@ -112,6 +114,7 @@ def construir(saida_dir: Path) -> int:
     )
 
     _escrever(saida_dir / "coverage.json", coverage())
+    _escrever(saida_dir / "consistency.json", consistency())
     _escrever(saida_dir / "categories.json", list_categories())
     _escrever(saida_dir / "preparations.json", list_preparations())
     _escrever(saida_dir / "foods.json", {"total": todos["total"], "foods": todos["foods"]})
@@ -157,6 +160,7 @@ def construir(saida_dir: Path) -> int:
             "source": "https://github.com/brolesi/taco",
             "endpoints": [
                 "coverage.json",
+                "consistency.json",
                 "categories.json",
                 "categories/{slug}.json",
                 "preparations.json",
