@@ -11,13 +11,14 @@ from __future__ import annotations
 import math
 import unicodedata
 from pathlib import Path
+from typing import Annotated
 
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, create_model
 
-API_VERSION = "1.10.0"
+API_VERSION = "1.11.0"
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "processed" / "taco"
 POF_DIR = Path(__file__).resolve().parent.parent / "data" / "processed" / "pof"
@@ -115,6 +116,33 @@ AMINO_ACIDS_COLUMNS = {
     "glicina_g": "glycine_g",
     "prolina_g": "proline_g",
     "serina_g": "serine_g",
+}
+
+# Valores Diários de Referência para adultos: Anexo II da IN 75/2020 (Anvisa),
+# na unidade do campo da API. Ressalvas, no dicionário de dados: o carboidrato
+# da TACO inclui a fibra (o rótulo não) e a niacina é pré-formada (o VDR é em NE).
+DAILY_VALUES = {
+    "energy_kcal": 2000,
+    "carbohydrate_g": 300,
+    "protein_g": 50,
+    "lipids_g": 65,
+    "cholesterol_mg": 300,
+    "dietary_fiber_g": 25,
+    "sodium_mg": 2000,
+    "calcium_mg": 1000,
+    "magnesium_mg": 420,
+    "manganese_mg": 3,
+    "phosphorus_mg": 700,
+    "iron_mg": 14,
+    "potassium_mg": 3500,
+    "copper_mg": 0.9,
+    "zinc_mg": 11,
+    "rae_mcg": 800,
+    "thiamine_mg": 1.2,
+    "riboflavin_mg": 1.2,
+    "pyridoxine_mg": 1.3,
+    "niacin_mg": 15,
+    "vitamin_c_mg": 100,
 }
 
 TEXT_FIELDS = {"id", "category", "description", "base_name", "preparation", "qualifiers"}
@@ -232,6 +260,19 @@ def _get_food(food_id: int) -> dict:
     if matches.empty:
         raise HTTPException(status_code=404, detail=f"Food with id {food_id} not found")
     return _row_to_dict(matches.iloc[0])
+
+
+def _daily_values_pct(valores: dict) -> dict[str, float | None]:
+    """%VD (IN 75/2020) de cada nutriente com VDR; None quando não há dado."""
+    return {
+        campo: None if valores.get(campo) is None else round(valores[campo] / vdr * 100, 1)
+        for campo, vdr in DAILY_VALUES.items()
+    }
+
+
+_DAILY_VALUES_QUERY = Query(
+    description="Add daily_values_pct: % of the adult Daily Value (Anvisa IN 75/2020)",
+)
 
 
 def _nutrient_cols(df: pd.DataFrame) -> list[str]:
@@ -594,8 +635,11 @@ def list_foods(
 
 
 @app.get("/foods/{food_id}", tags=["foods"], responses={200: {"model": FoodOut}})
-def get_food(food_id: int):
+def get_food(food_id: int, daily_values: Annotated[bool, _DAILY_VALUES_QUERY] = False):
+    """Composição completa por 100 g; com `daily_values`, também o %VD por 100 g."""
     food = _get_food(food_id)
+    if daily_values:
+        food["daily_values_pct"] = _daily_values_pct(food)
 
     for chave, df in (("fatty_acids", df_fatty_acids), ("amino_acids", df_amino_acids)):
         row = _find_row(df, food_id)
@@ -665,7 +709,7 @@ def compare_foods(body: CompareRequest):
 
 
 @app.post("/foods/sum", tags=["tools"])
-def sum_nutrients(body: SumRequest):
+def sum_nutrients(body: SumRequest, daily_values: Annotated[bool, _DAILY_VALUES_QUERY] = False):
     """Soma os nutrientes de uma lista de alimentos ponderada pela quantidade em gramas.
 
     Os valores da TACO referem-se a 100 g de parte comestível; cada alimento
@@ -692,4 +736,8 @@ def sum_nutrients(body: SumRequest):
                 totals[key] += val * factor
 
     totals = {k: round(v, DECIMAL_PLACES) for k, v in totals.items()}
-    return {"items": foods_used, "total_nutrients": totals, "missing_values": missing}
+    resposta = {"items": foods_used, "total_nutrients": totals, "missing_values": missing}
+    if daily_values:
+        # Total parcial quando há missing_values: o %VD herda essa ressalva.
+        resposta["daily_values_pct"] = _daily_values_pct(totals)
+    return resposta

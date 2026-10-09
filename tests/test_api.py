@@ -301,3 +301,20 @@ def test_consistencia_aponta_contradicoes_da_taco():
     assert {f["id"] for f in checks["energy_kj_mismatch"]} == {292, 559}
     # Cerveja: o álcool não está na planilha, então as frações não fecham 100 g.
     assert [f["id"] for f in checks["proximates_not_100g"]] == [474]
+
+
+def test_valores_diarios_por_100g():
+    food = client.get("/foods/561", params={"daily_values": "true"}).json()
+    vd = food["daily_values_pct"]
+    assert vd["iron_mg"] == round(food["iron_mg"] / 14 * 100, 1)  # VDR do ferro: 14 mg
+    assert vd["cholesterol_mg"] is None  # sem dado na TACO não vira 0%
+    assert "daily_values_pct" not in client.get("/foods/561").json()  # opcional
+
+
+def test_valores_diarios_na_soma():
+    body = client.post(
+        "/foods/sum", params={"daily_values": "true"}, json={"items": [{"id": 1, "grams": 200}]}
+    ).json()
+    assert body["daily_values_pct"]["energy_kcal"] == round(
+        body["total_nutrients"]["energy_kcal"] / 2000 * 100, 1
+    )
