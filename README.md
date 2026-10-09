@@ -237,12 +237,12 @@ Os nomes de campo da API estão mapeados no
 | GET    | `/measures/types`                                     | Tipos de medida caseira e sua frequência                                           |
 | GET    | `/foods?search=&base_name=&preparation=&skip=&limit=` | Lista/busca paginada de alimentos (busca ignora acentos)                           |
 | GET    | `/foods?sort=-iron_mg&min_value=&max_value=`          | Ranking por nutriente (`-` = decrescente), com faixa opcional de valor             |
-| GET    | `/foods/{id}`                                         | Composição completa de um alimento                                                 |
+| GET    | `/foods/{id}`                                         | Composição completa de um alimento (`?daily_values=true` adiciona o %VD)           |
 | GET    | `/foods/{id}/variants`                                | O mesmo alimento em outras formas de preparo                                       |
 | GET    | `/foods/{id}/fatty-acids`                             | Perfil de ácidos graxos                                                            |
 | GET    | `/foods/{id}/amino-acids`                             | Perfil de aminoácidos                                                              |
 | POST   | `/foods/compare`                                      | Compara a composição de 2+ alimentos                                               |
-| POST   | `/foods/sum`                                          | Soma nutrientes ponderados por gramas (`missing_values` lista nutrientes sem dado) |
+| POST   | `/foods/sum`                                          | Soma nutrientes ponderados por gramas (`missing_values` lista nutrientes sem dado; `?daily_values=true` adiciona o %VD) |
 
 Exemplo:
 

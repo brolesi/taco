@@ -3,6 +3,16 @@
 Este arquivo segue o formato [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.11.0] - 2026-10-09
+
+### Adicionado
+
+- `?daily_values=true` em `GET /foods/{id}` e `POST /foods/sum`: acrescenta
+  `daily_values_pct`, o percentual do Valor Diário de Referência para adultos
+  (Anexo II da IN 75/2020, Anvisa) de 21 nutrientes. Opcional — sem o
+  parâmetro, as respostas não mudam. Nutriente sem dado sai `null`. Ressalvas
+  (carboidrato com fibra, niacina pré-formada) no dicionário de dados.
+
 ## [1.10.0] - 2026-10-09
 
 ### Adicionado
@@ -217,6 +227,7 @@ endpoints referem-se ao protótipo anterior, que não chegou a ser versionado.
   pipeline de processamento (`notebooks/01-process-taco.py`) e CSVs
   normalizados em `data/processed/taco/`. A API REST só veio na 1.1.0.
 
+[1.11.0]: https://github.com/brolesi/taco/compare/v1.10.0...v1.11.0
 [1.10.0]: https://github.com/brolesi/taco/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/brolesi/taco/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/brolesi/taco/compare/v1.7.0...v1.8.0

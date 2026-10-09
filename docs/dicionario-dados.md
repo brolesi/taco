@@ -158,6 +158,41 @@ Perfil de aminoácidos, disponível apenas para um subconjunto de alimentos.
 | `prolina_g` | g | Prolina | `proline_g` |
 | `serina_g` | g | Serina | `serine_g` |
 
+## Valores diários (%VD)
+
+`GET /foods/{id}?daily_values=true` e `POST /foods/sum?daily_values=true`
+acrescentam `daily_values_pct`: quanto o alimento (por 100 g) ou a soma
+representa do Valor Diário de Referência para adultos do **Anexo II da
+IN 75/2020 da Anvisa**, com uma casa decimal.
+
+| Campo da API | VDR | Campo da API | VDR |
+|---|---|---|---|
+| `energy_kcal` | 2.000 kcal | `phosphorus_mg` | 700 mg |
+| `carbohydrate_g` | 300 g | `iron_mg` | 14 mg |
+| `protein_g` | 50 g | `potassium_mg` | 3.500 mg |
+| `lipids_g` | 65 g | `copper_mg` | 900 µg (0,9 mg) |
+| `cholesterol_mg` | 300 mg | `zinc_mg` | 11 mg |
+| `dietary_fiber_g` | 25 g | `rae_mcg` (vitamina A) | 800 µg RAE |
+| `sodium_mg` | 2.000 mg | `thiamine_mg` | 1,2 mg |
+| `calcium_mg` | 1.000 mg | `riboflavin_mg` | 1,2 mg |
+| `magnesium_mg` | 420 mg | `pyridoxine_mg` (B6) | 1,3 mg |
+| `manganese_mg` | 3 mg | `niacin_mg` | 15 mg NE |
+| | | `vitamin_c_mg` | 100 mg |
+
+Não é o %VD de um rótulo, e há três diferenças a conhecer:
+
+- **Carboidrato**: na TACO ele inclui a fibra alimentar (é calculado por
+  diferença); no rótulo, a fibra é declarada à parte, com fator de energia
+  próprio. O %VD de `carbohydrate_g` fica, portanto, acima do de um rótulo.
+- **Niacina**: o VDR é em equivalentes de niacina (NE, que somam a niacina
+  formada a partir do triptofano); a TACO traz a niacina pré-formada, então o
+  %VD fica subestimado.
+- **Ácidos graxos** (saturados, trans etc.) têm VDR, mas estão na tabela de
+  ácidos graxos, não na composição, e ficam de fora.
+
+Nutriente sem dado sai `null`, nunca 0%. O traço (`1e-05`) vira `0.0`. Na
+soma, o %VD herda a ressalva de `missing_values`: é sobre um total parcial.
+
 ## Cobertura dos dados
 
 A TACO não analisou todos os nutrientes em todos os alimentos. Saber o que
