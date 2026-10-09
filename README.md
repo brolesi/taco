@@ -228,6 +228,7 @@ Os nomes de campo da API estão mapeados no
 | GET    | `/`                                                   | Metadados da API                                                                   |
 | GET    | `/health`                                             | Verificação de saúde                                                               |
 | GET    | `/coverage`                                           | Quantos alimentos têm dado para cada nutriente                                     |
+| GET    | `/consistency`                                        | Alimentos em que a TACO contradiz a própria metodologia                            |
 | GET    | `/categories`                                         | Categorias e contagem de alimentos                                                 |
 | GET    | `/categories/{nome}`                                  | Alimentos de uma categoria                                                         |
 | GET    | `/preparations`                                       | Formas de preparo e contagem de alimentos                                          |

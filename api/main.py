@@ -17,7 +17,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, create_model
 
-API_VERSION = "1.8.0"
+API_VERSION = "1.9.0"
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "processed" / "taco"
 POF_DIR = Path(__file__).resolve().parent.parent / "data" / "processed" / "pof"
@@ -336,6 +336,7 @@ def root():
         "endpoints": [
             "GET  /health",
             "GET  /coverage",
+            "GET  /consistency",
             "GET  /categories",
             "GET  /categories/{name}",
             "GET  /foods",
@@ -384,6 +385,58 @@ def coverage():
                 "coverage_pct": round(len(df_amino_acids) / total * 100, 1),
             },
         },
+    }
+
+
+# Composição centesimal: com o carboidrato calculado por diferença, as cinco
+# frações somam 100 g. Fator kcal -> kJ declarado na metodologia da TACO.
+_CENTESIMAL = ["moisture_pct", "protein_g", "lipids_g", "carbohydrate_g", "ash_g"]
+KJ_PER_KCAL = 4.184
+
+
+def _issues(mask: pd.Series, campos: list[str]) -> list[dict]:
+    linhas = df_composition.loc[mask.fillna(False), ["id", "description", *campos]]
+    return [_row_to_dict(row) for _, row in linhas.iterrows()]
+
+
+@app.get("/consistency", tags=["meta"])
+def consistency():
+    """Alimentos em que a própria TACO contradiz a metodologia que publicou.
+
+    Só verifica o que a metodologia permite verificar. A energia **não** é
+    recalculada a partir dos macronutrientes: a TACO usou fatores de Atwater
+    específicos por alimento, que não constam da tabela, e o fator genérico
+    4/4/9 acusaria falsamente cerca de um terço dos alimentos. Os dados não são
+    corrigidos — o relatório só aponta onde desconfiar.
+    """
+    d = df_composition
+    soma = d[_CENTESIMAL].sum(axis=1, min_count=len(_CENTESIMAL))
+    return {
+        "checks": [
+            {
+                "check": "fiber_exceeds_carbohydrate",
+                "description": "Dietary fiber above total carbohydrate, which includes fiber",
+                "foods": _issues(
+                    d["dietary_fiber_g"] > d["carbohydrate_g"],
+                    ["dietary_fiber_g", "carbohydrate_g"],
+                ),
+            },
+            {
+                "check": "energy_kj_mismatch",
+                "description": f"energy_kj differs from energy_kcal x {KJ_PER_KCAL} by over 1 kJ",
+                "foods": _issues(
+                    (d["energy_kj"] - d["energy_kcal"] * KJ_PER_KCAL).abs() > 1,
+                    ["energy_kcal", "energy_kj"],
+                ),
+            },
+            {
+                # Carboidrato zero é convenção da TACO para carnes e peixes (a
+                # diferença daria negativo ou foi desprezada), não erro: fica de fora.
+                "check": "proximates_not_100g",
+                "description": "Proximates (with carbohydrate by difference) off 100 g by over 1 g",
+                "foods": _issues((d["carbohydrate_g"] > 0) & ((soma - 100).abs() > 1), _CENTESIMAL),
+            },
+        ],
     }
 
 

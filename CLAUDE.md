@@ -13,11 +13,12 @@ Anaconda em `C:\Users\suzan\anaconda3\python.exe -m venv .venv` e instale
 .venv\Scripts\python.exe -m pytest                       # todos os testes
 .venv\Scripts\python.exe -m pytest tests/test_api.py::test_get_food  # um teste
 .venv\Scripts\python.exe -m ruff check .                 # lint (CI falha se não passar)
+.venvScriptspython.exe -m ruff format --check .        # formatação (CI falha se não passar; sem --check aplica)
 .venv\Scripts\python.exe scripts\process_taco.py         # regenera os CSVs processados
 .venv\Scripts\python.exe -m uvicorn api.main:app --reload  # sobe a API (ou run.bat)
 ```
 
-O CI (`.github/workflows/ci.yml`) roda `ruff check .` e `pytest` em cada push/PR
+O CI (`.github/workflows/ci.yml`) roda `ruff check .`, `ruff format --check .` e `pytest` em cada push/PR
 para `main`. Configuração de ruff/pytest em `pyproject.toml` (linha de 100 chars;
 `pythonpath = ["."]` é o que permite `from api.main import app` nos testes).
 

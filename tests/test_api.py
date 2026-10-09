@@ -290,3 +290,14 @@ def test_ranking_preserva_traco():
 def test_ranking_campo_invalido():
     assert client.get("/foods", params={"sort": "description"}).status_code == 422
     assert client.get("/foods", params={"min_value": 1}).status_code == 422
+
+
+def test_consistencia_aponta_contradicoes_da_taco():
+    checks = {c["check"]: c["foods"] for c in client.get("/consistency").json()["checks"]}
+    # Carboidrato da TACO inclui a fibra; fibra maior que ele é contradição.
+    fibra = checks["fiber_exceeds_carbohydrate"]
+    assert all(f["dietary_fiber_g"] > f["carbohydrate_g"] for f in fibra)
+    assert 163 in [f["id"] for f in fibra]  # abacate
+    assert {f["id"] for f in checks["energy_kj_mismatch"]} == {292, 559}
+    # Cerveja: o álcool não está na planilha, então as frações não fecham 100 g.
+    assert [f["id"] for f in checks["proximates_not_100g"]] == [474]
