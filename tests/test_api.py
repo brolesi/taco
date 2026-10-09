@@ -257,3 +257,36 @@ def test_cors_liberado_para_front_end():
     )
     assert preflight.status_code == 200
     assert "POST" in preflight.headers["access-control-allow-methods"]
+
+
+def test_ranking_por_nutriente_decrescente():
+    body = client.get("/foods", params={"sort": "-iron_mg", "limit": 10}).json()
+    ferro = [f["iron_mg"] for f in body["foods"]]
+    assert ferro == sorted(ferro, reverse=True)
+    assert body["total"] == 597  # ordenar não filtra
+
+
+def test_ranking_sem_dado_vai_para_o_fim():
+    # Colesterol falta em mais da metade da TACO: no fim, mesmo em ordem crescente.
+    body = client.get("/foods", params={"sort": "cholesterol_mg", "skip": 590}).json()
+    assert body["foods"][-1]["cholesterol_mg"] is None
+
+
+def test_filtro_por_faixa_do_nutriente():
+    body = client.get(
+        "/foods", params={"sort": "protein_g", "min_value": 20, "max_value": 25, "limit": 100}
+    ).json()
+    assert body["total"] > 0
+    assert all(20 <= f["protein_g"] <= 25 for f in body["foods"])
+
+
+def test_ranking_preserva_traco():
+    # O traço (1e-5) não pode virar zero no arredondamento da resposta.
+    body = client.get("/foods", params={"sort": "lipids_g", "max_value": 1e-5}).json()
+    assert body["total"] > 0
+    assert 1e-5 in [f["lipids_g"] for f in body["foods"]]
+
+
+def test_ranking_campo_invalido():
+    assert client.get("/foods", params={"sort": "description"}).status_code == 422
+    assert client.get("/foods", params={"min_value": 1}).status_code == 422
