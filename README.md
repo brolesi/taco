@@ -207,6 +207,13 @@ uvicorn api.main:app --reload
 No Windows, o atalho [`run.bat`](run.bat) faz o mesmo. A documentação interativa
 (Swagger) fica em <http://127.0.0.1:8000/docs>.
 
+Sem Python local, com Docker:
+
+```bash
+docker build -t taco .
+docker run -p 8000:8000 taco
+```
+
 ### Regenerar os CSVs processados
 
 Os CSVs já estão versionados; execute os pipelines apenas se quiser reproduzi-los

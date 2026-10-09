@@ -3,7 +3,7 @@
   "name": "taco",
   "title": "TACO - Tabela Brasileira de Composição de Alimentos (dados normalizados)",
   "description": "TACO 4ª edição (NEPA/UNICAMP) e Tabela de Medidas Referidas da POF 2008-2009 (IBGE), normalizadas a partir das planilhas originais. Valores nutricionais por 100 g de parte comestível; 1e-05 representa traço (Tr) e vazio, não analisado. Os códigos de alimento da POF não correspondem aos da TACO.",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "homepage": "https://github.com/brolesi/taco",
   "id": "https://doi.org/10.5281/zenodo.22145839",
   "licenses": [

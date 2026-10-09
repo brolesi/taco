@@ -37,3 +37,18 @@ jobs:
 
       - name: Testes (pytest)
         run: pytest
+
+  docker:
+    # Não há Docker na máquina de desenvolvimento: é aqui que o Dockerfile é testado.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build da imagem
+        run: docker build -t taco .
+
+      - name: A API sobe e responde
+        run: |
+          docker run -d -p 8000:8000 taco
+          curl -fsS --retry 15 --retry-all-errors --retry-delay 1 http://localhost:8000/health
+          curl -fsS http://localhost:8000/foods/561 | grep -q "\"id\":561"
