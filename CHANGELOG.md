@@ -3,6 +3,21 @@
 Este arquivo segue o formato [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.10.0] - 2026-10-09
+
+### Adicionado
+
+- `datapackage.json` no padrão Frictionless Data: tipos, unidades, descrições,
+  chaves primárias, chaves estrangeiras (ácidos graxos e aminoácidos →
+  composição) e restrições dos quatro CSVs, legível por máquina.
+- O CI passou a rodar `frictionless validate datapackage.json`: coluna
+  renomeada, tipo trocado ou valor fora de faixa no pipeline quebra o build.
+  `frictionless` entrou em `requirements-dev.txt`.
+- Quatro alimentos têm `carboidrato_g` levemente negativo (de −0,007 a
+  −0,045 g) na planilha original, efeito do cálculo por diferença sobre médias.
+  Os valores foram mantidos e o esquema não exige mínimo 0 nessa coluna;
+  a nota está no dicionário de dados.
+
 ## [1.9.0] - 2026-10-09
 
 ### Adicionado
@@ -202,6 +217,7 @@ endpoints referem-se ao protótipo anterior, que não chegou a ser versionado.
   pipeline de processamento (`notebooks/01-process-taco.py`) e CSVs
   normalizados em `data/processed/taco/`. A API REST só veio na 1.1.0.
 
+[1.10.0]: https://github.com/brolesi/taco/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/brolesi/taco/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/brolesi/taco/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/brolesi/taco/compare/v1.6.0...v1.7.0

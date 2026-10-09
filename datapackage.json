@@ -1,0 +1,891 @@
+{
+  "profile": "tabular-data-package",
+  "name": "taco",
+  "title": "TACO - Tabela Brasileira de Composição de Alimentos (dados normalizados)",
+  "description": "TACO 4ª edição (NEPA/UNICAMP) e Tabela de Medidas Referidas da POF 2008-2009 (IBGE), normalizadas a partir das planilhas originais. Valores nutricionais por 100 g de parte comestível; 1e-05 representa traço (Tr) e vazio, não analisado. Os códigos de alimento da POF não correspondem aos da TACO.",
+  "version": "1.10.0",
+  "homepage": "https://github.com/brolesi/taco",
+  "id": "https://doi.org/10.5281/zenodo.22145839",
+  "licenses": [
+    {
+      "name": "MIT",
+      "path": "https://opensource.org/licenses/MIT"
+    }
+  ],
+  "contributors": [
+    {
+      "title": "Fabio Fogliarini Brolesi",
+      "role": "author"
+    }
+  ],
+  "sources": [
+    {
+      "title": "TACO 4ª edição, NEPA/UNICAMP"
+    },
+    {
+      "title": "POF 2008-2009, Tabela de Medidas Referidas, IBGE"
+    }
+  ],
+  "keywords": [
+    "food composition",
+    "TACO",
+    "POF",
+    "nutrition",
+    "Brazil",
+    "open data"
+  ],
+  "resources": [
+    {
+      "name": "taco_composicao",
+      "path": "data/processed/taco/taco_composicao.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "schema": {
+        "fields": [
+          {
+            "name": "numero_alimento",
+            "type": "integer",
+            "description": "Identificador do alimento na TACO",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "descricao",
+            "type": "string",
+            "description": "Descrição do alimento",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "umidade_pct",
+            "type": "number",
+            "description": "Umidade",
+            "unit": "%",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "energia_kcal",
+            "type": "number",
+            "description": "Energia",
+            "unit": "kcal",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "energia_kj",
+            "type": "number",
+            "description": "Energia",
+            "unit": "kJ",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "proteina_g",
+            "type": "number",
+            "description": "Proteína",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "lipideos_g",
+            "type": "number",
+            "description": "Lipídeos totais",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "colesterol_mg",
+            "type": "number",
+            "description": "Colesterol",
+            "unit": "mg",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "carboidrato_g",
+            "type": "number",
+            "description": "Carboidrato total",
+            "unit": "g"
+          },
+          {
+            "name": "fibra_g",
+            "type": "number",
+            "description": "Fibra alimentar",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "cinzas_g",
+            "type": "number",
+            "description": "Cinzas (resíduo mineral)",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "calcio_mg",
+            "type": "number",
+            "description": "Cálcio",
+            "unit": "mg",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "magnesio_mg",
+            "type": "number",
+            "description": "Magnésio",
+            "unit": "mg",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "manganes_mg",
+            "type": "number",
+            "description": "Manganês",
+            "unit": "mg",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "fosforo_mg",
+            "type": "number",
+            "description": "Fósforo",
+            "unit": "mg",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "ferro_mg",
+            "type": "number",
+            "description": "Ferro",
+            "unit": "mg",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "sodio_mg",
+            "type": "number",
+            "description": "Sódio",
+            "unit": "mg",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "potassio_mg",
+            "type": "number",
+            "description": "Potássio",
+            "unit": "mg",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "cobre_mg",
+            "type": "number",
+            "description": "Cobre",
+            "unit": "mg",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "zinco_mg",
+            "type": "number",
+            "description": "Zinco",
+            "unit": "mg",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "retinol_mcg",
+            "type": "number",
+            "description": "Retinol",
+            "unit": "µg",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "RE_mcg",
+            "type": "number",
+            "description": "Equivalente de retinol (RE)",
+            "unit": "µg",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "RAE_mcg",
+            "type": "number",
+            "description": "Equivalente de atividade de retinol (RAE)",
+            "unit": "µg",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "tiamina_mg",
+            "type": "number",
+            "description": "Tiamina (vitamina B1)",
+            "unit": "mg",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "riboflavina_mg",
+            "type": "number",
+            "description": "Riboflavina (vitamina B2)",
+            "unit": "mg",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "piridoxina_mg",
+            "type": "number",
+            "description": "Piridoxina (vitamina B6)",
+            "unit": "mg",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "niacina_mg",
+            "type": "number",
+            "description": "Niacina (vitamina B3)",
+            "unit": "mg",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "vitamina_c_mg",
+            "type": "number",
+            "description": "Vitamina C",
+            "unit": "mg",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "base",
+            "type": "string",
+            "description": "Alimento-base (1º termo da descrição)"
+          },
+          {
+            "name": "preparo",
+            "type": "string",
+            "description": "Forma de preparo canônica, se houver"
+          },
+          {
+            "name": "qualificadores",
+            "type": "string",
+            "description": "Demais termos da descrição, na ordem original"
+          },
+          {
+            "name": "categoria",
+            "type": "string",
+            "description": "Categoria do alimento",
+            "constraints": {
+              "required": true
+            }
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "numero_alimento"
+        ]
+      }
+    },
+    {
+      "name": "taco_acidos_graxos",
+      "path": "data/processed/taco/taco_acidos_graxos.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "schema": {
+        "fields": [
+          {
+            "name": "numero_alimento",
+            "type": "integer",
+            "description": "Identificador do alimento",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "descricao",
+            "type": "string",
+            "description": "Descrição do alimento",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "saturados_g",
+            "type": "number",
+            "description": "Ácidos graxos saturados totais",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "monoinsaturados_g",
+            "type": "number",
+            "description": "Monoinsaturados totais",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "poliinsaturados_g",
+            "type": "number",
+            "description": "Poli-insaturados totais",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "c12_0_g",
+            "type": "number",
+            "description": "Láurico (12:0)",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "c14_0_g",
+            "type": "number",
+            "description": "Mirístico (14:0)",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "c16_0_g",
+            "type": "number",
+            "description": "Palmítico (16:0)",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "c18_0_g",
+            "type": "number",
+            "description": "Esteárico (18:0)",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "c20_0_g",
+            "type": "number",
+            "description": "Araquídico (20:0)",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "c22_0_g",
+            "type": "number",
+            "description": "Beênico (22:0)",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "c24_0_g",
+            "type": "number",
+            "description": "Lignocérico (24:0)",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "c14_1_g",
+            "type": "number",
+            "description": "Miristoleico (14:1)",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "c16_1_g",
+            "type": "number",
+            "description": "Palmitoleico (16:1)",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "c18_1_g",
+            "type": "number",
+            "description": "Oleico (18:1)",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "c20_1_g",
+            "type": "number",
+            "description": "Gadoleico (20:1)",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "c18_2n6_g",
+            "type": "number",
+            "description": "Linoleico (18:2 n-6)",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "c18_3n3_g",
+            "type": "number",
+            "description": "Alfa-linolênico (18:3 n-3)",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "c20_4_g",
+            "type": "number",
+            "description": "Araquidônico (20:4)",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "c20_5_g",
+            "type": "number",
+            "description": "EPA (20:5)",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "c22_5_g",
+            "type": "number",
+            "description": "DPA (22:5)",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "c22_6_g",
+            "type": "number",
+            "description": "DHA (22:6)",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "c18_1t_g",
+            "type": "number",
+            "description": "Trans-oleico (18:1t)",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "c18_2t_g",
+            "type": "number",
+            "description": "Trans-linoleico (18:2t)",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "categoria",
+            "type": "string",
+            "description": "Categoria do alimento",
+            "constraints": {
+              "required": true
+            }
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "numero_alimento"
+        ],
+        "foreignKeys": [
+          {
+            "fields": [
+              "numero_alimento"
+            ],
+            "reference": {
+              "resource": "taco_composicao",
+              "fields": [
+                "numero_alimento"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "taco_aminoacidos",
+      "path": "data/processed/taco/taco_aminoacidos.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "schema": {
+        "fields": [
+          {
+            "name": "numero_alimento",
+            "type": "integer",
+            "description": "Identificador do alimento",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "descricao",
+            "type": "string",
+            "description": "Descrição do alimento",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "triptofano_g",
+            "type": "number",
+            "description": "Triptofano",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "treonina_g",
+            "type": "number",
+            "description": "Treonina",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "isoleucina_g",
+            "type": "number",
+            "description": "Isoleucina",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "leucina_g",
+            "type": "number",
+            "description": "Leucina",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "lisina_g",
+            "type": "number",
+            "description": "Lisina",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "metionina_g",
+            "type": "number",
+            "description": "Metionina",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "cistina_g",
+            "type": "number",
+            "description": "Cistina",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "fenilalanina_g",
+            "type": "number",
+            "description": "Fenilalanina",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "tirosina_g",
+            "type": "number",
+            "description": "Tirosina",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "valina_g",
+            "type": "number",
+            "description": "Valina",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "arginina_g",
+            "type": "number",
+            "description": "Arginina",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "histidina_g",
+            "type": "number",
+            "description": "Histidina",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "alanina_g",
+            "type": "number",
+            "description": "Alanina",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "acido_aspartico_g",
+            "type": "number",
+            "description": "Ácido aspártico",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "acido_glutamico_g",
+            "type": "number",
+            "description": "Ácido glutâmico",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "glicina_g",
+            "type": "number",
+            "description": "Glicina",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "prolina_g",
+            "type": "number",
+            "description": "Prolina",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "serina_g",
+            "type": "number",
+            "description": "Serina",
+            "unit": "g",
+            "constraints": {
+              "minimum": 0
+            }
+          },
+          {
+            "name": "categoria",
+            "type": "string",
+            "description": "Categoria do alimento",
+            "constraints": {
+              "required": true
+            }
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "numero_alimento"
+        ],
+        "foreignKeys": [
+          {
+            "fields": [
+              "numero_alimento"
+            ],
+            "reference": {
+              "resource": "taco_composicao",
+              "fields": [
+                "numero_alimento"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "pof_medidas_caseiras",
+      "path": "data/processed/pof/pof_medidas_caseiras.csv",
+      "profile": "tabular-data-resource",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "schema": {
+        "fields": [
+          {
+            "name": "codigo_alimento",
+            "type": "integer",
+            "description": "Código do alimento no IBGE",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "descricao_alimento",
+            "type": "string",
+            "description": "Descrição do alimento na POF",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "codigo_preparacao",
+            "type": "integer",
+            "description": "Código da preparação",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "descricao_preparacao",
+            "type": "string",
+            "description": "Preparação (`NAO SE APLICA` quando não há)"
+          },
+          {
+            "name": "codigo_medida",
+            "type": "integer",
+            "description": "Código do tipo de medida",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "descricao_medida",
+            "type": "string",
+            "description": "Tipo de medida caseira",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "codigo_medida_referencia",
+            "type": "number",
+            "description": "Código da medida de referência"
+          },
+          {
+            "name": "descricao_medida_referencia",
+            "type": "string",
+            "description": "Medida usada como referência"
+          },
+          {
+            "name": "quantidade_g",
+            "type": "number",
+            "description": "Peso da medida",
+            "unit": "g",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "codigo_fonte",
+            "type": "number",
+            "description": "Código da fonte bibliográfica (ver publicação da POF)"
+          },
+          {
+            "name": "descricao_fonte",
+            "type": "string",
+            "description": "Descrição do alimento na fonte"
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "codigo_alimento",
+          "codigo_preparacao",
+          "codigo_medida"
+        ]
+      }
+    }
+  ]
+}

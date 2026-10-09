@@ -27,6 +27,7 @@ taco/
 │   ├── raw/              # Fontes originais, imutáveis (TACO .xls, POF .xls)
 │   └── processed/         # CSVs canônicos gerados pelos pipelines (taco/, pof/)
 ├── docs/                 # Dicionário de dados
+├── datapackage.json      # Esquema dos CSVs (Frictionless Data)
 ├── references/           # Documentos originais (PDFs) e guia de normalização
 ├── scripts/              # Pipelines de processamento (TACO e POF)
 └── tests/                # Testes da API
@@ -272,6 +273,15 @@ SELECT descricao, ferro_mg FROM taco_composicao
 WHERE preparo = 'cozido' ORDER BY ferro_mg DESC LIMIT 5;
 ```
 
+O [`datapackage.json`](datapackage.json) descreve os quatro CSVs no padrão
+[Frictionless Data](https://specs.frictionlessdata.io/): tipos, unidades,
+chaves e restrições, legíveis por máquina. Ferramentas que entendem o padrão
+carregam os dados já tipados, e o CI valida os CSVs contra ele:
+
+```bash
+frictionless validate datapackage.json
+```
+
 Detalhes de colunas, unidades e valores especiais (`Tr`, `NA`) no
 [dicionário de dados](docs/dicionario-dados.md). A
 [cobertura por nutriente](docs/dicionario-dados.md#cobertura-dos-dados) diz o
@@ -289,10 +299,13 @@ essa ponte — veja
 ```bash
 pip install -r requirements-dev.txt
 ruff check .   # lint
+ruff format --check .  # formatação
+frictionless validate datapackage.json  # CSVs x esquema
 pytest         # testes
 ```
 
-O CI (GitHub Actions) executa lint e testes em cada push/PR para `main`.
+O CI (GitHub Actions) executa lint, formatação, validação do esquema e testes
+em cada push/PR para `main`.
 Veja [CONTRIBUTING.md](CONTRIBUTING.md) para o fluxo completo e
 [CHANGELOG.md](CHANGELOG.md) para o histórico de mudanças.
 

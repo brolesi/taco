@@ -17,7 +17,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, create_model
 
-API_VERSION = "1.9.0"
+API_VERSION = "1.10.0"
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "processed" / "taco"
 POF_DIR = Path(__file__).resolve().parent.parent / "data" / "processed" / "pof"
