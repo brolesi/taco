@@ -173,6 +173,10 @@ Um valor ausente (NaN) significa "não analisado", e é diferente de `Tr`
 (traço, gravado como `1e-05`) e de zero. Por isso `/foods/sum` devolve
 `missing_values` em vez de somar ausência como zero.
 
+No ranking (`GET /foods?sort=`), alimentos sem dado para o nutriente ordenado
+vão para o fim da lista em qualquer direção, e `min_value`/`max_value` os
+excluem — ausência não é tratada como zero em nenhum dos dois casos.
+
 ## `pof_medidas_caseiras.csv` (11.801 registros)
 
 Gerado por [`scripts/process_pof.py`](../scripts/process_pof.py) a partir de

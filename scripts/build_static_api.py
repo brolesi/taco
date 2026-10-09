@@ -100,7 +100,10 @@ def construir(saida_dir: Path) -> int:
     saida_dir.mkdir(parents=True)
 
     ids = [int(i) for i in df_composition["id"]]
-    todos = list_foods(search=None, base_name=None, preparation=None, skip=0, limit=len(ids))
+    todos = list_foods(
+        search=None, base_name=None, preparation=None, sort=None,
+        min_value=None, max_value=None, skip=0, limit=len(ids),
+    )
 
     _escrever(saida_dir / "coverage.json", coverage())
     _escrever(saida_dir / "categories.json", list_categories())

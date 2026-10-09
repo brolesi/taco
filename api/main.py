@@ -17,7 +17,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, create_model
 
-API_VERSION = "1.7.0"
+API_VERSION = "1.8.0"
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "processed" / "taco"
 POF_DIR = Path(__file__).resolve().parent.parent / "data" / "processed" / "pof"
@@ -483,9 +483,30 @@ def list_foods(
         None,
         description="Preparation: cru, cozido, frito, grelhado, assado, refogado, torrado",
     ),
+    sort: str | None = Query(
+        None,
+        description="Nutrient field to sort by, e.g. 'iron_mg'; prefix '-' for descending",
+    ),
+    min_value: float | None = Query(None, description="Minimum value of the sort nutrient"),
+    max_value: float | None = Query(None, description="Maximum value of the sort nutrient"),
     skip: int = Query(0, ge=0, description="Number of items to skip"),
     limit: int = Query(25, ge=1, le=100, description="Max items to return"),
 ):
+    """Lista, busca e ranqueia alimentos.
+
+    Com `sort`, cada item traz também o valor do nutriente ordenado (por 100 g).
+    Alimentos sem dado para esse nutriente vão para o fim, em qualquer direção;
+    `min_value`/`max_value` os excluem, pois não há valor a comparar.
+    """
+    campo = sort.removeprefix("-") if sort else None
+    if campo is not None and campo not in _nutrient_cols(df_composition):
+        raise HTTPException(
+            status_code=422,
+            detail=f"Invalid sort field '{campo}'. Valid: {_nutrient_cols(df_composition)}",
+        )
+    if campo is None and (min_value is not None or max_value is not None):
+        raise HTTPException(status_code=422, detail="min_value/max_value require sort")
+
     filtered = df_composition
     if search:
         filtered = filtered[
@@ -495,13 +516,27 @@ def list_foods(
         filtered = filtered[_searchable_bases.loc[filtered.index] == _fold(base_name)]
     if preparation:
         filtered = filtered[filtered["preparation"] == _fold(preparation)]
+
+    colunas = ["id", "category", "description"]
+    if campo:
+        if min_value is not None:
+            filtered = filtered[filtered[campo] >= min_value]
+        if max_value is not None:
+            filtered = filtered[filtered[campo] <= max_value]
+        # Ordenação estável: empates mantêm a ordem da TACO (por id).
+        filtered = filtered.sort_values(
+            campo, ascending=not sort.startswith("-"), kind="stable", na_position="last"
+        )
+        colunas.append(campo)
+
     total = len(filtered)
-    page = filtered.iloc[skip : skip + limit][["id", "category", "description"]]
+    page = filtered.iloc[skip : skip + limit][colunas]
     return {
         "total": total,
         "skip": skip,
         "limit": limit,
-        "foods": page.to_dict(orient="records"),
+        # _row_to_dict: NaN -> None e o arredondamento que preserva o traço.
+        "foods": [_row_to_dict(row) for _, row in page.iterrows()],
     }
 
 

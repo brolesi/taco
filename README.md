@@ -234,6 +234,7 @@ Os nomes de campo da API estão mapeados no
 | GET    | `/measures?search=&measure=`                          | Peso em gramas de medidas caseiras (POF)                                           |
 | GET    | `/measures/types`                                     | Tipos de medida caseira e sua frequência                                           |
 | GET    | `/foods?search=&base_name=&preparation=&skip=&limit=` | Lista/busca paginada de alimentos (busca ignora acentos)                           |
+| GET    | `/foods?sort=-iron_mg&min_value=&max_value=`          | Ranking por nutriente (`-` = decrescente), com faixa opcional de valor             |
 | GET    | `/foods/{id}`                                         | Composição completa de um alimento                                                 |
 | GET    | `/foods/{id}/variants`                                | O mesmo alimento em outras formas de preparo                                       |
 | GET    | `/foods/{id}/fatty-acids`                             | Perfil de ácidos graxos                                                            |
@@ -246,6 +247,7 @@ Exemplo:
 ```bash
 curl "http://127.0.0.1:8000/foods?search=arroz&limit=3"
 curl "http://127.0.0.1:8000/foods?base_name=feijao&preparation=cozido"
+curl "http://127.0.0.1:8000/foods?sort=-iron_mg&limit=5"
 curl "http://127.0.0.1:8000/measures?search=arroz&measure=colher%20de%20sopa"
 curl -X POST "http://127.0.0.1:8000/foods/sum" \
   -H "Content-Type: application/json" \

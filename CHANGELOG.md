@@ -3,6 +3,16 @@
 Este arquivo segue o formato [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.8.0] - 2026-10-09
+
+### Adicionado
+
+- Ranking e filtro por nutriente em `GET /foods`: `sort` (campo do nutriente,
+  prefixo `-` para decrescente) e `min_value`/`max_value` sobre esse campo.
+  Com `sort`, cada item traz também o valor do nutriente. Alimentos sem dado
+  vão para o fim da lista, e a faixa de valor os exclui — ausência não vira
+  zero. Responde a "quais alimentos têm mais ferro?" sem baixar a tabela.
+
 ## [1.7.0] - 2026-08-28
 
 ### Adicionado
@@ -181,6 +191,7 @@ endpoints referem-se ao protótipo anterior, que não chegou a ser versionado.
   pipeline de processamento (`notebooks/01-process-taco.py`) e CSVs
   normalizados em `data/processed/taco/`. A API REST só veio na 1.1.0.
 
+[1.8.0]: https://github.com/brolesi/taco/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/brolesi/taco/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/brolesi/taco/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/brolesi/taco/compare/v1.4.0...v1.5.0
