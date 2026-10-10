@@ -1,9 +1,10 @@
 """Testes do gerador da API estática (GitHub Pages)."""
 
 import json
+import zipfile
 
 from api.main import API_VERSION, get_food
-from scripts.build_static_api import _slug, construir
+from scripts.build_static_api import ZIP_NOME, _slug, construir
 
 
 def test_slug():
@@ -27,6 +28,13 @@ def test_site_estatico_reflete_a_api(tmp_path):
 
     medidas = json.loads((tmp_path / "measures" / "index.json").read_text(encoding="utf-8"))
     assert medidas["total"] == 1119
+
+    # O zip traz o site inteiro (menos ele mesmo), para hospedar uma cópia.
+    with zipfile.ZipFile(tmp_path / ZIP_NOME) as zf:
+        nomes = {n for n in zf.namelist() if not n.endswith("/")}  # sem entradas de pasta
+    assert {"index.html", "foods/561.json", "api.dc.html"} <= nomes
+    assert ZIP_NOME not in nomes
+    assert len(nomes) == total - 1
 
     # NaN não é JSON válido; nutriente ausente tem de virar null.
     bruto = (tmp_path / "foods" / "1.json").read_text(encoding="utf-8")

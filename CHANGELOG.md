@@ -3,6 +3,21 @@
 Este arquivo segue o formato [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [Unreleased]
+
+### Adicionado
+
+- `taco-api-estatica.zip` publicado junto da API estática
+  (<https://brolesi.github.io/taco/taco-api-estatica.zip>): o site inteiro,
+  para guardar localmente ou hospedar uma cópia em outro servidor.
+
+### Alterado
+
+- A documentação interativa (`api.dc.html`) busca os JSON relativos à própria
+  página, e não mais em `https://brolesi.github.io/taco/` fixo. No GitHub Pages
+  nada muda; numa cópia hospedada em outro site, ela passa a usar os arquivos
+  da cópia.
+
 ## [1.12.0] - 2026-10-09
 
 ### Adicionado
@@ -237,6 +252,7 @@ endpoints referem-se ao protótipo anterior, que não chegou a ser versionado.
   pipeline de processamento (`notebooks/01-process-taco.py`) e CSVs
   normalizados em `data/processed/taco/`. A API REST só veio na 1.1.0.
 
+[Unreleased]: https://github.com/brolesi/taco/compare/v1.12.0...HEAD
 [1.12.0]: https://github.com/brolesi/taco/compare/v1.11.0...v1.12.0
 [1.11.0]: https://github.com/brolesi/taco/compare/v1.10.0...v1.11.0
 [1.10.0]: https://github.com/brolesi/taco/compare/v1.9.0...v1.10.0

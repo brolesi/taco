@@ -198,6 +198,12 @@ curl https://brolesi.github.io/taco/foods/561.json
 curl https://brolesi.github.io/taco/coverage.json
 ```
 
+O site inteiro também sai num zip,
+<https://brolesi.github.io/taco/taco-api-estatica.zip> (~1,2 MB), para guardar
+localmente ou hospedar uma cópia: os links são relativos, então basta
+descompactar em qualquer pasta de um servidor web, inclusive a documentação
+interativa.
+
 ### Subir a API
 
 ```bash
