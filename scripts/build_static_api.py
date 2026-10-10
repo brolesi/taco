@@ -38,6 +38,8 @@ from api.main import (
 
 RAIZ_PROJETO = Path(__file__).resolve().parents[1]
 SAIDA_PADRAO = RAIZ_PROJETO / "dist" / "site"
+# O site inteiro num zip, publicado junto dele, para quem quer hospedar uma cópia.
+ZIP_NOME = "taco-api-estatica.zip"
 
 
 def _slug(texto: str) -> str:
@@ -89,6 +91,9 @@ Versão {versao}. Sem servidor, sem chave, sem limite de requisições.</p>
 </ul>
 <p>Os códigos da POF são do IBGE e <strong>não</strong> correspondem aos ids da
 TACO; não há equivalência automática entre as duas tabelas.</p>
+<p>Para hospedar uma cópia: <a href="{zip_nome}">{zip_nome}</a> traz este site
+inteiro, com links relativos — basta descompactar em qualquer pasta de um
+servidor web.</p>
 <p><a href="https://github.com/brolesi/taco">Código, dados e a API dinâmica em
 FastAPI</a> · MIT</p>
 </html>
@@ -174,7 +179,7 @@ def construir(saida_dir: Path) -> int:
     )
 
     (saida_dir / "index.html").write_text(
-        PAGINA_INICIAL.format(versao=API_VERSION, n_foods=len(ids)),
+        PAGINA_INICIAL.format(versao=API_VERSION, n_foods=len(ids), zip_nome=ZIP_NOME),
         encoding="utf-8",
         newline="\n",
     )
@@ -187,6 +192,12 @@ def construir(saida_dir: Path) -> int:
         src = docs_dir / arquivo
         if src.exists():
             shutil.copy(src, saida_dir / arquivo)
+
+    # Gerado fora da pasta e movido para dentro: senão o zip incluiria a si mesmo.
+    zip_temp = shutil.make_archive(
+        str(saida_dir.with_name(saida_dir.name + "-zip")), "zip", saida_dir
+    )
+    shutil.move(zip_temp, saida_dir / ZIP_NOME)
 
     return sum(1 for _ in saida_dir.rglob("*") if _.is_file())
 

@@ -481,7 +481,8 @@
 
 </x-dc>
 <script type="text/x-dc" data-dc-script>
-const BASE = 'https://brolesi.github.io/taco/';
+// Relativo à página: o mesmo arquivo funciona no GitHub Pages e copiado (zip) para outro site.
+const BASE = new URL('./', location.href).href;
 
 const LABELS = {
   id: 'ID', description: 'Descrição', base_name: 'Alimento base', preparation: 'Preparação',
