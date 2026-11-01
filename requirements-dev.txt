@@ -2,5 +2,5 @@
 pytest>=9.1.1
 pytest-cov>=7.1.0
 httpx>=0.28.1  # requerido pelo TestClient do FastAPI
-ruff>=0.16.9
+ruff>=0.17.3
 frictionless>=5.20.0  # valida datapackage.json no CI
